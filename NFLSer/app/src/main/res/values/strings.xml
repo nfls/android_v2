@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">NFLSer</string>
+    <string name="developer">GuardHei</string>
+
+    <string name="home">Home</string>
+    <string name="resources">Resources</string>
+    <string name="gc">Game Center</string>
+    <string name="forum">Forum</string>
+    <string name="ic">International Center</string>
+    <string name="alumni">Alumni</string>
+    <string name="wiki">Wiki</string>
+    <string name="weather">Weather</string>
+    <string name="media">Media</string>
+
+    <string name="func_bloc_list_header">Function Blocks</string>
+</resources>
