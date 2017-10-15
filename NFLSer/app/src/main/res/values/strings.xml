@@ -12,5 +12,15 @@
     <string name="weather">Weather</string>
     <string name="media">Media</string>
 
+    <string name="login_activity_title">Login</string>
+    <string name="sign_up_activity_title">Sign-Up</string>
+
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Haven\'t got an account ?</string>
+    <string name="reset_password">Forget the Password ?</string>
+
     <string name="func_bloc_list_header">Function Blocks</string>
+    <string name="func_bloc_list_footer">Buy Us a Coffee</string>
 </resources>

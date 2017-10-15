@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -14,7 +15,7 @@
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ToolbarTheme">
+        android:theme="@style/ToolbarTheme">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,9 +25,9 @@
                 android:id="@+id/list_icon"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:paddingBottom="5dp"
                 android:background="@null"
-                android:src="@drawable/selector_list_icon"
-                android:tint="@drawable/selector_tool_icon_tint"
+                android:src="@mipmap/nflsio"
                 android:clickable="true"/>
 
             <TextView
@@ -36,7 +37,7 @@
                 android:layout_weight="5"
                 android:layout_gravity="center"
                 android:background="@null"
-                android:text="@string/app_name"
+                android:text="@string/login_activity_title"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textStyle="bold"
@@ -55,5 +56,79 @@
         </LinearLayout>
 
     </android.support.v7.widget.Toolbar>
+
+    <EditText
+        android:id="@+id/input_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="@string/username"
+        android:textColorHint="@color/colorAccentLight"
+        android:inputType="text"
+        android:imeOptions="actionNext"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:windowSoftInputMode="adjustUnspecified"/>
+
+    <EditText
+        android:id="@+id/input_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/password"
+        android:textColorHint="@color/colorAccentLight"
+        android:inputType="textPassword"
+        android:imeOptions="actionDone"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:windowSoftInputMode="adjustUnspecified"/>
+
+    <TextView
+        android:id="@+id/login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:background="@null"
+        android:text="@string/login"
+        android:textAlignment="center"
+        android:textColor="@drawable/selector_text_button_tint"
+        android:textStyle="normal"
+        android:textSize="25sp"
+        android:clickable="true"/>
+
+    <TextView
+        android:id="@+id/sign_up_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:background="@null"
+        android:text="@string/sign_up"
+        android:textAlignment="center"
+        android:textColor="@drawable/selector_text_button_tint"
+        android:textStyle="normal"
+        android:textSize="15sp"
+        android:clickable="true"/>
+
+    <TextView
+        android:id="@+id/reset_password_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:background="@null"
+        android:text="@string/reset_password"
+        android:textAlignment="center"
+        android:textColor="@drawable/selector_text_button_tint"
+        android:textStyle="normal"
+        android:textSize="15sp"
+        android:clickable="true"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:indeterminate="true"/>
 
 </LinearLayout>

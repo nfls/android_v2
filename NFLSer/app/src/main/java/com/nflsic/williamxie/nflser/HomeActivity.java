@@ -39,12 +39,14 @@ public class HomeActivity extends AppCompatActivity {
         mAdapter = new FunctionBlockAdapter(mData, mContext);
 
         View header = LayoutInflater.from(this).inflate(R.layout.header_list_function_block, null, false);
-        list_function_block.addHeaderView(header);
+        View footer = LayoutInflater.from(this).inflate(R.layout.footer_list_function_block, null, false);
+        list_function_block.addHeaderView(header, null, false);
+        list_function_block.addFooterView(footer, null, true);
         list_function_block.setAdapter(mAdapter);
         list_function_block.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (i == 0) {
+                if (i == mData.size() + 1) {
                     return;
                 }
                 Toast.makeText(HomeActivity.this, mData.get(i - 1).getIcon(), Toast.LENGTH_SHORT).show();
