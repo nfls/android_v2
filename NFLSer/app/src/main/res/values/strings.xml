@@ -20,6 +20,10 @@
     <string name="login">Login</string>
     <string name="sign_up">Haven\'t got an account ?</string>
     <string name="reset_password">Forget the Password ?</string>
+    <string name="request_time_out">Request Time Out</string>
+    <string name="login_success">Login Success !</string>
+    <string name="login_failed">Login Failed</string>
+    <string name="offline">No Internet Detected</string>
 
     <string name="func_bloc_list_header">Function Blocks</string>
     <string name="func_bloc_list_footer">Buy Us a Coffee</string>

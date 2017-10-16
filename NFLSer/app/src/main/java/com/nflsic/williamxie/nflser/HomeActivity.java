@@ -2,6 +2,7 @@ package com.nflsic.williamxie.nflser;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
 
 public class HomeActivity extends AppCompatActivity {
@@ -65,9 +70,8 @@ public class HomeActivity extends AppCompatActivity {
         settings_icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+
             }
         });
     }
-
 }

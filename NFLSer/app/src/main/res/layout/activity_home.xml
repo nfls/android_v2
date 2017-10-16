@@ -90,14 +90,8 @@
             android:layout_gravity="left"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:cacheColorHint="@color/colorless"
             android:background="@color/colorPrimary"
-            android:headerDividersEnabled="true"
-            android:footerDividersEnabled="true"
-            android:divider="@color/colorAccentLight"
-            android:dividerHeight="3dp"
-            android:choiceMode="singleChoice"
-            android:fastScrollEnabled="true"/>
+            android:choiceMode="singleChoice"/>
 
     </LinearLayout>
 

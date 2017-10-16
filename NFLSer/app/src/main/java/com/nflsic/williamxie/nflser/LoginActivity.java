@@ -1,5 +1,8 @@
 package com.nflsic.williamxie.nflser;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -10,49 +13,102 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.net.ssl.*;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import static com.nflsic.williamxie.nflser.RuntimeInfo.isOnline;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String TOKEN_CORRECT = "token_correct";
+    private static final String TOKEN_WRONG = "token_wrong";
+    private static final String REQUEST_FAILED = "request_failed";
+
     private ProgressBar progressBar = null;
+    private TextView loginButton = null;
+    private TextView signUpButton = null;
+    private TextView resetPasswordButton = null;
+
     private String username = null;
     private String password = null;
 
-    Handler handler = new Handler() {
+    private Handler loginHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             Bundle data = msg.getData();
-            String value = data.getString("value");
+            String jsonString = data.getString("json");
             progressBar.setVisibility(View.INVISIBLE);
-            Toast.makeText(LoginActivity.this, value, Toast.LENGTH_SHORT).show();
+            if (jsonString.equals(REQUEST_FAILED)) {
+                Toast.makeText(LoginActivity.this, R.string.request_time_out, Toast.LENGTH_LONG).show();
+            } else {
+                JSONObject json = null;
+                try {
+                    json = new JSONObject(jsonString);
+                    if (json.getJSONObject("info").getString("status").equals("success")) {
+                        Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_LONG).show();
+                        storeCookies(json.getJSONObject("info").getString("token"));
+                        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                    } else {
+                        Toast.makeText(LoginActivity.this, json.getJSONObject("info").getString("message"), Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     };
 
-    Runnable loginTask = new Runnable() {
+    private Handler autoLoginHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Bundle data = msg.getData();
+            String result = data.getString("result");
+            if (result.equals(TOKEN_CORRECT)) {
+                Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_LONG).show();
+                Intent intent =new Intent(LoginActivity.this, HomeActivity.class);
+                startActivity(intent);
+            }
+            loginButton.setEnabled(true);
+            signUpButton.setEnabled(true);
+            resetPasswordButton.setEnabled(true);
+        }
+    };
 
+    private Runnable loginTask = new Runnable() {
         @Override
         public void run() {
-
             Message msg = new Message();
             Bundle data = new Bundle();
-            data.putString("value", postLoginRequest());
+            data.putString("json", postLoginRequest());
             msg.setData(data);
-            handler.sendMessage(msg);
+            loginHandler.sendMessage(msg);
+        }
+    };
+
+    private Runnable autoLoginTask = new Runnable() {
+        @Override
+        public void run() {
+            Message msg = new Message();
+            Bundle data = new Bundle();
+            data.putString("result", autoLogin());
+            msg.setData(data);
+            autoLoginHandler.sendMessage(msg);
         }
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        checkLoginState();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -71,8 +127,8 @@ public class LoginActivity extends AppCompatActivity {
         final EditText input_username = (EditText) findViewById(R.id.input_username);
         final EditText input_password = (EditText) findViewById(R.id.input_password);
 
-        TextView login = (TextView) findViewById(R.id.login_button);
-        login.setOnClickListener(new View.OnClickListener() {
+        loginButton = (TextView) findViewById(R.id.login_button);
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 username = input_username.getText().toString();
@@ -82,33 +138,43 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        TextView signUp = (TextView) findViewById(R.id.sign_up_button);
-        signUp.setOnClickListener(new View.OnClickListener() {
+        signUpButton = (TextView) findViewById(R.id.sign_up_button);
+        signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
             }
         });
 
-        TextView resetPassword = (TextView) findViewById(R.id.reset_password_button);
-        resetPassword.setOnClickListener(new View.OnClickListener() {
+        resetPasswordButton = (TextView) findViewById(R.id.reset_password_button);
+        resetPasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
             }
         });
-    }
 
-    private void checkLoginState() {
+        loginButton.setEnabled(false);
+        signUpButton.setEnabled(false);
+        resetPasswordButton.setEnabled(false);
 
+        isOnline = NFLSUtil.isNetworkAvailable(LoginActivity.this);
+
+        if (!isOnline) {
+            Intent intent =new Intent(LoginActivity.this, HomeActivity.class);
+            startActivity(intent);
+        } else {
+            new Thread(autoLoginTask).start();
+        }
     }
 
     private String postLoginRequest() {
-        String result = null;
+        String json = null;
         try {
             URL url = new URL("https://api.nfls.io/center/login?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
             connection.setRequestMethod("POST");
 
             String data = "username=" + username + "&password=" + password + "&session=app";
@@ -121,9 +187,11 @@ public class LoginActivity extends AppCompatActivity {
             outputStream.write(data.getBytes());
 
             int responseCode = connection.getResponseCode();
-            if (responseCode == 200) {
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
                 InputStream in = connection.getInputStream();
-                result = inputStreamToString(in);
+                json = NFLSUtil.inputStreamToString(in);
+            } else {
+                json = REQUEST_FAILED;
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -132,26 +200,76 @@ public class LoginActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return json;
+    }
+
+    private String autoLogin() {
+        String result = null;
+        SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
+        String token = preferences.getString("token", "No Token");
+        URL url;
+        try {
+            url = new URL("https://api.nfls.io/device/status?");
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Cookie", " token=" + token);
+
+            Log.d("Token", token);
+            Log.d("Header", getReqeustHeader(connection));
+
+            int responseCode = connection.getResponseCode();
+
+            Log.d("ResponseCode", responseCode + "");
+
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                JSONObject json = new JSONObject(NFLSUtil.inputStreamToString(connection.getInputStream()));
+                result = TOKEN_CORRECT;
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putInt("id", json.getInt("id"));
+                editor.commit();
+            } else {
+                result = TOKEN_WRONG;
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return result;
     }
 
-    public static String inputStreamToString(InputStream in) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int length;
-        try {
-            while ((length = in.read(buffer)) != -1) {
-                out.write(buffer, 0, length);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void storeCookies(String token) {
+        SharedPreferences preferences = getSharedPreferences("user", Context.MODE_APPEND);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("token", token);
+        editor.commit();
+    }
+
+    private void clearPreferences() {
+        SharedPreferences preferences = getSharedPreferences("user", Context.MODE_APPEND);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
+    }
+
+    private String getReqeustHeader(HttpsURLConnection conn) {
+        Map<String, List<String>> requestHeaderMap = conn.getRequestProperties();
+        Iterator<String> requestHeaderIterator = requestHeaderMap.keySet().iterator();
+        StringBuilder sbRequestHeader = new StringBuilder();
+        while (requestHeaderIterator.hasNext()) {
+            String requestHeaderKey = requestHeaderIterator.next();
+            String requestHeaderValue = conn.getRequestProperty(requestHeaderKey);
+            sbRequestHeader.append(requestHeaderKey);
+            sbRequestHeader.append(":");
+            sbRequestHeader.append(requestHeaderValue);
+            sbRequestHeader.append("\n");
         }
-        String result = null;
-        try {
-            result = out.toString("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return result;
+        return sbRequestHeader.toString();
     }
 }
