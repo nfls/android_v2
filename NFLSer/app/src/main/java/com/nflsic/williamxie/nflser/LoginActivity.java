@@ -9,10 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,16 +22,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static com.nflsic.williamxie.nflser.NFLSUtil.REQUEST_FAILED;
+import static com.nflsic.williamxie.nflser.NFLSUtil.TOKEN_CORRECT;
+import static com.nflsic.williamxie.nflser.NFLSUtil.TOKEN_WRONG;
 import static com.nflsic.williamxie.nflser.RuntimeInfo.isOnline;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TOKEN_CORRECT = "token_correct";
-    private static final String TOKEN_WRONG = "token_wrong";
-    private static final String REQUEST_FAILED = "request_failed";
-
     private ProgressBar progressBar = null;
-    private TextView loginButton = null;
+    private Button loginButton = null;
     private TextView signUpButton = null;
     private TextView resetPasswordButton = null;
 
@@ -48,18 +44,22 @@ public class LoginActivity extends AppCompatActivity {
             Bundle data = msg.getData();
             String jsonString = data.getString("json");
             progressBar.setVisibility(View.INVISIBLE);
+            loginButton.setEnabled(true);
+            signUpButton.setEnabled(true);
+            resetPasswordButton.setEnabled(true);
             if (jsonString.equals(REQUEST_FAILED)) {
-                Toast.makeText(LoginActivity.this, R.string.request_time_out, Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, R.string.request_failed, Toast.LENGTH_LONG).show();
+                clearPreferences();
             } else {
                 JSONObject json = null;
                 try {
                     json = new JSONObject(jsonString);
                     if (json.getJSONObject("info").getString("status").equals("success")) {
-                        Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_LONG).show();
                         storeCookies(json.getJSONObject("info").getString("token"));
-                        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                        new Thread(getUsernameTask).start();
                     } else {
-                        Toast.makeText(LoginActivity.this, json.getJSONObject("info").getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, json.getJSONObject("info").getString("message"), Toast.LENGTH_SHORT).show();
+                        clearPreferences();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -72,16 +72,31 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Bundle data = msg.getData();
-            String result = data.getString("result");
-            if (result.equals(TOKEN_CORRECT)) {
-                Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_LONG).show();
-                Intent intent =new Intent(LoginActivity.this, HomeActivity.class);
-                startActivity(intent);
-            }
             loginButton.setEnabled(true);
             signUpButton.setEnabled(true);
             resetPasswordButton.setEnabled(true);
+            Bundle data = msg.getData();
+            String result = data.getString("result");
+            if (result.equals(TOKEN_CORRECT)) {
+                //Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_LONG).show();
+                SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
+                Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.welcome) + " " + preferences.getString("username", "Unknown") + " !", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                startActivity(intent);
+            } else {
+
+            }
+        }
+    };
+
+    private Handler getUsernameHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Bundle data = msg.getData();
+            SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
+            Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.welcome) + " " + preferences.getString("username", "Unknown") + " !", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
         }
     };
 
@@ -90,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
         public void run() {
             Message msg = new Message();
             Bundle data = new Bundle();
-            data.putString("json", postLoginRequest());
+            data.putString("json", postLoginRequest(username, password));
             msg.setData(data);
             loginHandler.sendMessage(msg);
         }
@@ -104,6 +119,17 @@ public class LoginActivity extends AppCompatActivity {
             data.putString("result", autoLogin());
             msg.setData(data);
             autoLoginHandler.sendMessage(msg);
+        }
+    };
+
+    private Runnable getUsernameTask = new Runnable() {
+        @Override
+        public void run() {
+            getUsername();
+            Message msg = new Message();
+            Bundle data = new Bundle();
+            msg.setData(data);
+            getUsernameHandler.sendMessage(msg);
         }
     };
 
@@ -127,10 +153,13 @@ public class LoginActivity extends AppCompatActivity {
         final EditText input_username = (EditText) findViewById(R.id.input_username);
         final EditText input_password = (EditText) findViewById(R.id.input_password);
 
-        loginButton = (TextView) findViewById(R.id.login_button);
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        loginButton = (Button) findViewById(R.id.login_button);
+        loginButton.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
+                loginButton.setEnabled(false);
+                signUpButton.setEnabled(false);
+                resetPasswordButton.setEnabled(false);
                 username = input_username.getText().toString();
                 password = input_password.getText().toString();
                 progressBar.setVisibility(View.VISIBLE);
@@ -142,7 +171,8 @@ public class LoginActivity extends AppCompatActivity {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                LoginActivity.this.startActivity(intent);
             }
         });
 
@@ -150,26 +180,36 @@ public class LoginActivity extends AppCompatActivity {
         resetPasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
             }
         });
 
-        loginButton.setEnabled(false);
-        signUpButton.setEnabled(false);
-        resetPasswordButton.setEnabled(false);
-
         isOnline = NFLSUtil.isNetworkAvailable(LoginActivity.this);
+        Log.d("Online", isOnline + "");
 
         if (!isOnline) {
-            Intent intent =new Intent(LoginActivity.this, HomeActivity.class);
+            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
         } else {
-            new Thread(autoLoginTask).start();
+            loginButton.setEnabled(false);
+            signUpButton.setEnabled(false);
+            resetPasswordButton.setEnabled(false);
+            SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
+            if (!preferences.getString("password", "fail").equals("fail")) {
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.remove("password");
+                editor.putString("username", username);
+                editor.commit();
+                input_username.setText(username);
+                input_password.setText(password);
+                new Thread(loginTask).start();
+            } else {
+                new Thread(autoLoginTask).start();
+            }
         }
     }
 
-    private String postLoginRequest() {
-        String json = null;
+    public static String postLoginRequest(String username, String password) {
+        String json = REQUEST_FAILED;
         try {
             URL url = new URL("https://api.nfls.io/center/login?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -179,7 +219,7 @@ public class LoginActivity extends AppCompatActivity {
 
             String data = "username=" + username + "&password=" + password + "&session=app";
 
-            connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             connection.setRequestProperty("Content-Length", data.length()+"");
 
             connection.setDoOutput(true);
@@ -190,8 +230,6 @@ public class LoginActivity extends AppCompatActivity {
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 InputStream in = connection.getInputStream();
                 json = NFLSUtil.inputStreamToString(in);
-            } else {
-                json = REQUEST_FAILED;
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -204,7 +242,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private String autoLogin() {
-        String result = null;
+        String result = REQUEST_FAILED;
         SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
         String token = preferences.getString("token", "No Token");
         URL url;
@@ -216,12 +254,7 @@ public class LoginActivity extends AppCompatActivity {
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Cookie", " token=" + token);
 
-            Log.d("Token", token);
-            Log.d("Header", getReqeustHeader(connection));
-
             int responseCode = connection.getResponseCode();
-
-            Log.d("ResponseCode", responseCode + "");
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 JSONObject json = new JSONObject(NFLSUtil.inputStreamToString(connection.getInputStream()));
@@ -244,7 +277,38 @@ public class LoginActivity extends AppCompatActivity {
         return result;
     }
 
-    private void storeCookies(String token) {
+    private void getUsername() {
+        SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
+        String token = preferences.getString("token", "No Token");
+        URL url;
+        try {
+            url = new URL("https://api.nfls.io/center/username?");
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Cookie", " token=" + token);
+
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                JSONObject json = new JSONObject(NFLSUtil.inputStreamToString(connection.getInputStream()));
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("username", json.getString("info"));
+                editor.commit();
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void storeCookies(String token) {
         SharedPreferences preferences = getSharedPreferences("user", Context.MODE_APPEND);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("token", token);
@@ -258,7 +322,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.commit();
     }
 
-    private String getReqeustHeader(HttpsURLConnection conn) {
+    public static String getRequestHeader(HttpsURLConnection conn) {
         Map<String, List<String>> requestHeaderMap = conn.getRequestProperties();
         Iterator<String> requestHeaderIterator = requestHeaderMap.keySet().iterator();
         StringBuilder sbRequestHeader = new StringBuilder();

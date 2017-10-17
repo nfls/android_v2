@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">NFLSer</string>
-    <string name="developer">GuardHei</string>
 
+    <string name="developer">GuardHei</string>
     <string name="home">Home</string>
     <string name="resources">Resources</string>
     <string name="gc">Game Center</string>
@@ -18,13 +18,21 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
-    <string name="sign_up">Haven\'t got an account ?</string>
-    <string name="reset_password">Forget the Password ?</string>
-    <string name="request_time_out">Request Time Out</string>
-    <string name="login_success">Login Success !</string>
-    <string name="login_failed">Login Failed</string>
+    <string name="login_hint">Already got an account ?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_up_hint">Haven\'t got an account ?</string>
+    <string name="reset_password">Send the Email</string>
+    <string name="reset_password_hint">Forget the Password ？</string>
+    <string name="request_failed">Request Failed</string>
     <string name="offline">No Internet Detected</string>
+    <string name="welcome">Welcome,</string>
+    <string name="email_address">Email Address</string>
+    <string name="email_address_hint">Please Notice the Format</string>
+    <string name="valid">Vaild</string>
+    <string name="invalid">Invalid</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="verification_code">Verification Code</string>
 
     <string name="func_bloc_list_header">Function Blocks</string>
-    <string name="func_bloc_list_footer">Buy Us a Coffee</string>
+    <string name="func_bloc_list_footer">Buy Us a Coffee !</string>
 </resources>

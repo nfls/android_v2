@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">南外人</string>
+    <string name="alumni">校友会</string>
+    <string name="forum">论坛</string>
+    <string name="func_bloc_list_footer">请我们喝杯咖啡吧 !</string>
+    <string name="func_bloc_list_header">功能块</string>
+    <string name="gc">游戏中心</string>
+    <string name="home">主页</string>
+    <string name="ic">国际部</string>
+    <string name="login">登录</string>
+    <string name="login_activity_title">登录</string>
+    <string name="login_failed">登录失败</string>
+    <string name="login_success">登录成功</string>
+    <string name="media">媒体中心</string>
+    <string name="offline">没有检测到网络</string>
+    <string name="password">密码</string>
+    <string name="request_failed">请求失败</string>
+    <string name="reset_password_hint">忘记密码 ？</string>
+    <string name="resources">资源中心</string>
+    <string name="sign_up_hint">还没有账户 ？</string>
+    <string name="sign_up_activity_title">注册</string>
+    <string name="username">用户名</string>
+    <string name="weather">气象站</string>
+    <string name="wiki">维基</string>
+    <string name="welcome">欢迎,</string>
+    <string name="verification_code">验证码</string>
+    <string name="email_address">电子邮箱地址</string>
+    <string name="phone_number">手机号码</string>
+    <string name="login_hint">已经有一个账户 ？</string>
+    <string name="reset_password">发送电子邮件</string>
+    <string name="sign_up">注册</string>
+    <string name="developer">嘿侍</string>
+    <string name="invalid">无效的</string>
+    <string name="valid">有效的</string>
+    <string name="email_address_hint">请注意格式</string>
+</resources>

@@ -11,14 +11,15 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 public class NFLSUtil {
+    public static final String TOKEN_CORRECT = "token_correct";
+    public static final String TOKEN_WRONG = "token_wrong";
+    public static final String REQUEST_FAILED = "request_failed";
     public static boolean isNetworkAvailable(Activity activity) {
         ConnectivityManager connectivity = (ConnectivityManager) activity.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
             NetworkInfo info = connectivity.getActiveNetworkInfo();
-            if (info != null && info.isConnected())
-            {
-                if (info.getState() == NetworkInfo.State.CONNECTED)
-                {
+            if (info != null && info.isConnected()) {
+                if (info.getState() == NetworkInfo.State.CONNECTED) {
                     return true;
                 }
             }
