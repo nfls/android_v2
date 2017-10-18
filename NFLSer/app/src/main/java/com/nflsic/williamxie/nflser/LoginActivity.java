@@ -188,6 +188,7 @@ public class LoginActivity extends AppCompatActivity {
         Log.d("Online", isOnline + "");
 
         if (!isOnline) {
+            Toast.makeText(LoginActivity.this, R.string.offline, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
         } else {
