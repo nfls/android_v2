@@ -47,13 +47,7 @@ public class SignUpActivity extends AppCompatActivity {
                 try {
                     JSONObject json = new JSONObject(jsonString).getJSONObject("info");
                     if (json.getString("status").equals("success")) {
-                        SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
-                        SharedPreferences.Editor editor = preferences.edit();
-                        editor.putString("username", username);
-                        editor.putString("password", password);
-                        editor.commit();
-                        Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                        startActivity(intent);
+                        new Thread(loginTask).start();
                     } else {
                         Toast.makeText(SignUpActivity.this, json.getString("message"), Toast.LENGTH_SHORT).show();
                     }
@@ -83,23 +77,24 @@ public class SignUpActivity extends AppCompatActivity {
                 JSONObject json = null;
                 try {
                     json = new JSONObject(jsonString);
-                    Log.d("JsonInfoSuccess", json.getJSONObject("info").getString("status").equals("success") + "");
-                    if (json.getJSONObject("info").getString("status").equals("success")) {
+                    json = json.getJSONObject("info");
+                    Log.d("JsonString", jsonString);
+                    Log.d("JsonInfoSuccess", json.getString("status").equals("success") + "");
+                    if (json.getString("status").equals("success")) {
                         SharedPreferences preferences = getSharedPreferences("user", Context.MODE_APPEND);
                         SharedPreferences.Editor editor = preferences.edit();
-                        editor.putString("token", json.getJSONObject("info").getString("token"));
+                        editor.putString("token", json.getString("token"));
                         editor.putString("username", username);
                         editor.commit();
                         Toast.makeText(SignUpActivity.this, SignUpActivity.this.getString(R.string.welcome) + " " + username + " !", Toast.LENGTH_LONG).show();
                         startActivity(new Intent(SignUpActivity.this, HomeActivity.class));
                     } else {
-                        Toast.makeText(SignUpActivity.this, json.getJSONObject("info").getString("message"), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignUpActivity.this, json.getString("message"), Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
         }
     };
 
@@ -111,7 +106,6 @@ public class SignUpActivity extends AppCompatActivity {
             data.putString("json", postSignUpRequest());
             msg.setData(data);
             signUpHandler.sendMessage(msg);
-            new Thread(loginTask).start();
         }
     };
 
