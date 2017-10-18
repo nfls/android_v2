@@ -9,9 +9,6 @@
     <string name="home">主页</string>
     <string name="ic">国际部</string>
     <string name="login">登录</string>
-    <string name="login_activity_title">登录</string>
-    <string name="login_failed">登录失败</string>
-    <string name="login_success">登录成功</string>
     <string name="media">媒体中心</string>
     <string name="offline">没有检测到网络</string>
     <string name="password">密码</string>
@@ -34,4 +31,8 @@
     <string name="invalid">无效的</string>
     <string name="valid">有效的</string>
     <string name="email_address_hint">请注意格式</string>
+    <string name="reset_password_activity_title">重置密码</string>
+    <string name="operation_succeed">操作成功</string>
+    <string name="login_activity_title">登录</string>
+    <string name="send_email_success">成功发送邮件</string>
 </resources>
