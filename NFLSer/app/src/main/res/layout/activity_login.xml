@@ -47,7 +47,7 @@
                 android:id="@+id/settings_icon"
                 android:layout_width="43dp"
                 android:layout_height="43dp"
-                android:layout_marginRight="15dp"
+                android:layout_marginEnd="15dp"
                 android:background="@null"
                 android:src="@drawable/selector_help_icon"
                 android:tint="@drawable/selector_tool_icon_tint"

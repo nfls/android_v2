@@ -23,7 +23,7 @@
     <string name="sign_up">Sign Up</string>
     <string name="sign_up_hint">Haven\'t got an account ?</string>
     <string name="reset_password">Send the Email</string>
-    <string name="reset_password_hint">Forget the Password ？</string>
+    <string name="reset_password_hint">Forget the password ？</string>
     <string name="request_failed">Request Failed</string>
     <string name="offline">No Internet Detected</string>
     <string name="welcome">Welcome,</string>
