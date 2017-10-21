@@ -1,4 +1,4 @@
-package com.nflsic.williamxie.nflser;
+package io.nfls.williamxie.nflser;
 
 import org.junit.Test;
 

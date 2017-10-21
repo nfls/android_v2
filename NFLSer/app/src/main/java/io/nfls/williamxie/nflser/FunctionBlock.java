@@ -1,6 +1,4 @@
-package com.nflsic.williamxie.nflser;
-
-import android.widget.ImageView;
+package io.nfls.williamxie.nflser;
 
 public class FunctionBlock {
 
@@ -33,10 +31,6 @@ public class FunctionBlock {
 
     public int getDescription() {
         return description;
-    }
-
-    public int getActivity() {
-        return activity;
     }
 
 }

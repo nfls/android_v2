@@ -1,8 +1,7 @@
-package com.nflsic.williamxie.nflser;
+package io.nfls.williamxie.nflser;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,24 +10,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.LinkedList;
 
 public class HomeActivity extends AppCompatActivity {
 
     private LinkedList<FunctionBlock> mData;
-    private Context mContext;
     private FunctionBlockAdapter mAdapter;
     private ListView list_function_block;
+    private boolean mIsExit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        mContext = HomeActivity.this;
         list_function_block = (ListView) findViewById(R.id.list_function_block);
 
         mData = new LinkedList<FunctionBlock>();
@@ -41,7 +35,7 @@ public class HomeActivity extends AppCompatActivity {
         mData.add(new FunctionBlock(R.string.weather, R.mipmap.weather_icon));
         mData.add(new FunctionBlock(R.string.media, R.mipmap.media_icon));
 
-        mAdapter = new FunctionBlockAdapter(mData, mContext);
+        mAdapter = new FunctionBlockAdapter(mData, HomeActivity.this);
 
         View header = LayoutInflater.from(this).inflate(R.layout.header_list_function_block, null, false);
         View footer = LayoutInflater.from(this).inflate(R.layout.footer_list_function_block, null, false);
@@ -54,7 +48,13 @@ public class HomeActivity extends AppCompatActivity {
                 if (i == mData.size() + 1) {
                     return;
                 }
-                Toast.makeText(HomeActivity.this, mData.get(i - 1).getIcon(), Toast.LENGTH_SHORT).show();
+                FunctionBlock block = mData.get(i - 1);
+                if (i == 1) {
+                    Toast.makeText(HomeActivity.this, block.getName(), Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(HomeActivity.this, ResourcesActivity.class));
+                } else {
+                    Toast.makeText(HomeActivity.this, R.string.close_tip, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -73,5 +73,25 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mIsExit) {
+            this.finish();
+            Intent backHome = new Intent(Intent.ACTION_MAIN);
+            backHome.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            backHome.addCategory(Intent.CATEGORY_HOME);
+            startActivity(backHome);
+        } else {
+            Toast.makeText(HomeActivity.this, getString(R.string.exit_tip), Toast.LENGTH_SHORT).show();
+            mIsExit = true;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mIsExit = false;
+                }
+            }, 2000);
+        }
     }
 }

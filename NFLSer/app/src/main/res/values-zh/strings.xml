@@ -35,4 +35,15 @@
     <string name="operation_succeed">操作成功</string>
     <string name="login_activity_title">登录</string>
     <string name="send_email_success">成功发送邮件</string>
+    <string name="exit_tip">再按一次退出</string>
+    <string name="news">动态</string>
+    <string name="cached">已缓存</string>
+    <string name="loading">加载中 ...</string>
+    <string name="close_tip">尚未开启</string>
+    <string name="downloading">下载中 ...</string>
+    <string name="delete_tip">是否删除该文件的本地缓存 ?</string>
+    <string name="warning">警告</string>
+    <string name="cancel">取消</string>
+    <string name="delete">删除</string>
+    <string name="unsupported_tip">不支持文件种类</string>
 </resources>

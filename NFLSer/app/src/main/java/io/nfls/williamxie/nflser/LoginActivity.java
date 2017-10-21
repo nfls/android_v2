@@ -1,4 +1,4 @@
-package com.nflsic.williamxie.nflser;
+package io.nfls.williamxie.nflser;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,10 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static com.nflsic.williamxie.nflser.NFLSUtil.REQUEST_FAILED;
-import static com.nflsic.williamxie.nflser.NFLSUtil.TOKEN_CORRECT;
-import static com.nflsic.williamxie.nflser.NFLSUtil.TOKEN_WRONG;
-import static com.nflsic.williamxie.nflser.RuntimeInfo.isOnline;
+import static io.nfls.williamxie.nflser.NFLSUtil.REQUEST_FAILED;
+import static io.nfls.williamxie.nflser.NFLSUtil.TOKEN_CORRECT;
+import static io.nfls.williamxie.nflser.NFLSUtil.TOKEN_WRONG;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -48,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
             signUpButton.setEnabled(true);
             resetPasswordButton.setEnabled(true);
             if (jsonString.equals(REQUEST_FAILED)) {
-                Toast.makeText(LoginActivity.this, R.string.request_failed, Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, R.string.request_failed, Toast.LENGTH_SHORT).show();
                 clearPreferences();
             } else {
                 JSONObject json = null;
@@ -80,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
             if (result.equals(TOKEN_CORRECT)) {
                 //Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_LONG).show();
                 SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
-                Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.welcome) + " " + preferences.getString("username", "Unknown") + " !", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.welcome) + " " + preferences.getString("username", "Unknown") + " !", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(intent);
             } else {
@@ -184,10 +183,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        isOnline = NFLSUtil.isNetworkAvailable(LoginActivity.this);
-        Log.d("Online", isOnline + "");
-
-        if (!isOnline) {
+        if (!NFLSUtil.isNetworkAvailable(LoginActivity.this)) {
             Toast.makeText(LoginActivity.this, R.string.offline, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
@@ -221,9 +217,6 @@ public class LoginActivity extends AppCompatActivity {
 
             String data = "username=" + username + "&password=" + password + "&session=app";
 
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            connection.setRequestProperty("Content-Length", data.length()+"");
-
             connection.setDoOutput(true);
             OutputStream outputStream = connection.getOutputStream();
             outputStream.write(data.getBytes());
@@ -232,6 +225,7 @@ public class LoginActivity extends AppCompatActivity {
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 InputStream in = connection.getInputStream();
                 json = NFLSUtil.inputStreamToString(in);
+                Log.d("Json", json);
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -255,6 +249,7 @@ public class LoginActivity extends AppCompatActivity {
             connection.setReadTimeout(5000);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Cookie", " token=" + token);
+            Log.d("Token", token);
 
             int responseCode = connection.getResponseCode();
 

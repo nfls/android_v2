@@ -1,4 +1,4 @@
-package com.nflsic.williamxie.nflser;
+package io.nfls.williamxie.nflser;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

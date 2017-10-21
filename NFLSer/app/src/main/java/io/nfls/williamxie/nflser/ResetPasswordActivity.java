@@ -1,7 +1,6 @@
-package com.nflsic.williamxie.nflser;
+package io.nfls.williamxie.nflser;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +20,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-import static com.nflsic.williamxie.nflser.NFLSUtil.REQUEST_FAILED;
+import static io.nfls.williamxie.nflser.NFLSUtil.REQUEST_FAILED;
 
 public class ResetPasswordActivity extends AppCompatActivity {
 

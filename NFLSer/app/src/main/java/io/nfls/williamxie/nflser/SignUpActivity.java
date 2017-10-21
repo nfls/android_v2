@@ -1,4 +1,4 @@
-package com.nflsic.williamxie.nflser;
+package io.nfls.williamxie.nflser;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,8 +23,6 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-import static com.nflsic.williamxie.nflser.NFLSUtil.REQUEST_FAILED;
-
 public class SignUpActivity extends AppCompatActivity {
 
     private ProgressBar progressBar = null;
@@ -41,7 +39,7 @@ public class SignUpActivity extends AppCompatActivity {
             super.handleMessage(msg);
             Bundle data = msg.getData();
             String jsonString = data.getString("json");
-            if (jsonString.equals(REQUEST_FAILED)) {
+            if (jsonString.equals(NFLSUtil.REQUEST_FAILED)) {
                 Toast.makeText(SignUpActivity.this, R.string.request_failed, Toast.LENGTH_LONG).show();
             } else {
                 try {
@@ -71,7 +69,7 @@ public class SignUpActivity extends AppCompatActivity {
             loginButton.setEnabled(true);
             signUpButton.setEnabled(true);
             Log.d("JsonString", jsonString);
-            if (jsonString.equals(REQUEST_FAILED)) {
+            if (jsonString.equals(NFLSUtil.REQUEST_FAILED)) {
                 Toast.makeText(SignUpActivity.this, R.string.request_failed, Toast.LENGTH_LONG).show();
             } else {
                 JSONObject json = null;
