@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 
 import java.io.ByteArrayOutputStream;
@@ -16,9 +17,9 @@ public class NFLSUtil {
     public static final String TOKEN_CORRECT = "token_correct";
     public static final String TOKEN_WRONG = "token_wrong";
     public static final String REQUEST_FAILED = "request_failed";
+    public static String FILE_PATH_DOWNLOAD = Environment.getExternalStorageDirectory() + "/download";
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {"android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"};
-
 
     public static void verifyStoragePermissions(Activity activity) {
         try {

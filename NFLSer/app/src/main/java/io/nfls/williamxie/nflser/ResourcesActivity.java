@@ -4,7 +4,6 @@ package io.nfls.williamxie.nflser;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
@@ -125,33 +124,46 @@ public class ResourcesActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 ResourceFile file = mData.get(i);
-                if (NFLSUtil.isNetworkAvailable(ResourcesActivity.this)) {
-                    if (file.isFolder()) {
-                        lastDirectoryPath = currentDirectoryPath;
-                        currentDirectoryPath = file.getHref();
+                if (file.isFolder()) {
+                    lastDirectoryPath = currentDirectoryPath;
+                    currentDirectoryPath = file.getHref();
+                    Log.d("isOnline", NFLSUtil.isNetworkAvailable(ResourcesActivity.this) + "");
+                    Log.d("CurDirPathWhenBack", currentDirectoryPath);
+                    if (NFLSUtil.isNetworkAvailable(ResourcesActivity.this)) {
                         goToDirectory(currentDirectoryPath);
                     } else {
-                        if (!file.isDownloaded()) {
-                            targetFile = file;
-                            alertDialog = new AlertDialog.Builder(ResourcesActivity.this)
-                                    .setTitle(R.string.downloading)
-                                    .setMessage(targetFile.getName())
-                                    .setIcon(R.mipmap.nflsio)
-                                    .setPositiveButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            thread.interrupt();
-                                        }
-                                    })
-                                    .show();
-                            thread = new Thread(downloadFileTask);
-                            thread.start();
-                        } else {
-                            viewFile(file);
-                        }
+                        goToLocalDirectory(currentDirectoryPath);
                     }
                 } else {
-
+                    if (!file.isDownloaded()) {
+                        targetFile = file;
+                        alertDialog = new AlertDialog.Builder(ResourcesActivity.this)
+                                .setTitle(R.string.app_name)
+                                .setMessage(R.string.download_tip)
+                                .setIcon(R.mipmap.nflsio)
+                                .setPositiveButton(R.string.download, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        thread = new Thread(downloadFileTask);
+                                        thread.start();
+                                        alertDialog = new AlertDialog.Builder(ResourcesActivity.this)
+                                                .setTitle(R.string.downloading)
+                                                .setMessage(targetFile.getName())
+                                                .setIcon(R.mipmap.nflsio)
+                                                .setPositiveButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        thread.interrupt();
+                                                    }
+                                                })
+                                                .show();
+                                    }
+                                })
+                                .setNegativeButton(R.string.cancel, null)
+                                .show();
+                    } else {
+                        viewFile(file);
+                    }
                 }
             }
         });
@@ -160,7 +172,7 @@ public class ResourcesActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final ResourceFile file = mData.get(i);
-                if (file.isDownloaded()) {
+                if (file.isDownloaded() && !file.isFolder()) {
                     alertDialog = new AlertDialog.Builder(ResourcesActivity.this)
                             .setTitle(R.string.warning)
                             .setMessage(R.string.delete_tip)
@@ -168,9 +180,12 @@ public class ResourcesActivity extends AppCompatActivity {
                             .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    File localFile = new File(Environment.getExternalStorageDirectory() + "/download" + file.getHref());
+                                    File localFile = new File(NFLSUtil.FILE_PATH_DOWNLOAD + file.getHref());
                                     localFile.delete();
                                     file.setDownloaded(false);
+                                    if (!NFLSUtil.isNetworkAvailable(ResourcesActivity.this)) {
+                                        mData.remove(file);
+                                    }
                                     refreshList();
                                 }
                             })
@@ -195,7 +210,11 @@ public class ResourcesActivity extends AppCompatActivity {
                     if (!lastDirectoryPath.equals("")) {
                         lastDirectoryPath = lastDirectoryPath.substring(0, lastDirectoryPath.lastIndexOf("/") + 1);
                     }
-                    goToDirectory(currentDirectoryPath);
+                    if (NFLSUtil.isNetworkAvailable(ResourcesActivity.this)) {
+                        goToDirectory(currentDirectoryPath);
+                    } else {
+                        goToLocalDirectory(currentDirectoryPath);
+                    }
                 } else {
                     exit();
                     //startActivity(new Intent(ResourcesActivity.this, HomeActivity.class));
@@ -214,19 +233,56 @@ public class ResourcesActivity extends AppCompatActivity {
 
         if (NFLSUtil.isNetworkAvailable(ResourcesActivity.this)) {
             goToDirectory(currentDirectoryPath);
+        } else {
+            goToLocalDirectory(currentDirectoryPath);
         }
     }
 
     private void exit() {
+        /*
         if (!alertDialog.equals(null)) {
             alertDialog.dismiss();
         }
+        */
         finish();
     }
 
     private void goToDirectory(String directoryPath) {
         alertDialog = new AlertDialog.Builder(ResourcesActivity.this).setMessage(R.string.loading).show();
         new Thread(getDirectoryTask).start();
+    }
+
+    private void goToLocalDirectory(String directoryPath) {
+        LinkedList<ResourceFile> mData = new LinkedList<ResourceFile>();
+        File dir = new File(NFLSUtil.FILE_PATH_DOWNLOAD + directoryPath);
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (int i = 0; i < files.length; i ++) {
+                File file = files[i];
+                String name = null;
+                String path = null;
+                try {
+                    name = java.net.URLDecoder.decode(file.getName(), "utf-8");
+                    path = file.getCanonicalPath();
+                    path = path.substring(path.lastIndexOf("/download/") + 9);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                boolean isFolder = file.isDirectory();
+                if (isFolder) path += "/";
+                long date = file.lastModified();
+                long size = file.length();
+                ResourceFile resourceFile = new ResourceFile(name, date, size, path, isFolder, !isFolder);
+                mData.add(resourceFile);
+            }
+        }
+        this.mData.clear();
+        this.mData.addAll(mData);
+        for (ResourceFile file : mData) {
+            Log.d("File", file.getName());
+        }
+        refreshList();
     }
 
     private void refreshList() {
@@ -271,7 +327,7 @@ public class ResourcesActivity extends AppCompatActivity {
                 if(currentDirectoryPath.equals(href) || !href.contains(currentDirectoryPath)) continue;
 
                 boolean isDownloaded = false;
-                String path = Environment.getExternalStorageDirectory() + "/download" + href;
+                String path = NFLSUtil.FILE_PATH_DOWNLOAD + href;
                 File file = new File(path);
                 if (file.exists()) {
                     isDownloaded = true;
@@ -361,7 +417,7 @@ public class ResourcesActivity extends AppCompatActivity {
                     }
                 }
                 bos.close();
-                String path = Environment.getExternalStorageDirectory() + "/download";
+                String path = NFLSUtil.FILE_PATH_DOWNLOAD;
                 String href = targetFile.getHref();
                 File dir = new File(path + href.substring(0, href.lastIndexOf("/")));
                 if (!dir.exists()) {
@@ -400,16 +456,16 @@ public class ResourcesActivity extends AppCompatActivity {
     private void viewFile(String href) {
         if (href.endsWith(".pdf")) {
             Intent intent = new Intent(ResourcesActivity.this, PdfViewerActivity.class);
-            intent.putExtra("filePath", Environment.getExternalStorageDirectory() + "/download" + href);
+            intent.putExtra("filePath", NFLSUtil.FILE_PATH_DOWNLOAD + href);
             startActivity(intent);
         } else if (href.endsWith(".mp4")) {
             Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
-            Uri data = Uri.parse(Environment.getExternalStorageDirectory() + "/download" + href);
+            Uri data = Uri.parse(NFLSUtil.FILE_PATH_DOWNLOAD + href);
             intent.setDataAndType(data, "video/mp4");
             startActivity(intent);
         } else if (href.endsWith(".jpg") || href.endsWith(".JPG") || href.endsWith(".png") || href.endsWith(".PNG")) {
             Intent intent = new Intent(ResourcesActivity.this, ImageViewerActivity.class);
-            intent.putExtra("filePath", Environment.getExternalStorageDirectory() + "/download" + href);
+            intent.putExtra("filePath", NFLSUtil.FILE_PATH_DOWNLOAD + href);
             startActivity(intent);
         } else {
             String suffix = "";
@@ -422,9 +478,6 @@ public class ResourcesActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (!alertDialog.equals(null)) {
-            alertDialog.dismiss();
-        }
-        finish();
+        exit();
     }
 }

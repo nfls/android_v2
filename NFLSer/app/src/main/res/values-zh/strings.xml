@@ -46,4 +46,7 @@
     <string name="cancel">取消</string>
     <string name="delete">删除</string>
     <string name="unsupported_tip">不支持文件种类</string>
+    <string name="download_tip">是否下载该文件到本地 ?</string>
+    <string name="download">下载</string>
+    <string name="confirm">确认</string>
 </resources>

@@ -43,7 +43,10 @@
     <string name="close_tip">Haven\'t Open Yet</string>
     <string name="warning">Warning</string>
     <string name="delete_tip">Do you want to delete the local file ?</string>
+    <string name="download_tip">Do you want to download the file to local ?</string>
     <string name="delete">Delete</string>
+    <string name="download">Download</string>
+    <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="unsupported_tip">Do not support file type</string>
 
