@@ -31,13 +31,13 @@
                 android:clickable="true"/>
 
             <TextView
-                android:id="@+id/login_title"
+                android:id="@+id/real_name_auth_title"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="5"
                 android:layout_gravity="center"
                 android:background="@null"
-                android:text="@string/login_activity_title"
+                android:text="@string/real_name_auth_activity_title"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textStyle="bold"
@@ -58,11 +58,11 @@
     </android.support.v7.widget.Toolbar>
 
     <EditText
-        android:id="@+id/input_username"
+        android:id="@+id/input_name_chinese"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:hint="@string/username"
+        android:hint="@string/chinese_name"
         android:textColorHint="@color/colorAccentLight"
         android:inputType="text"
         android:imeOptions="actionNext"
@@ -71,26 +71,52 @@
         android:windowSoftInputMode="adjustUnspecified"/>
 
     <EditText
-        android:id="@+id/input_password"
+        android:id="@+id/input_name_english"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:hint="@string/password"
+        android:hint="@string/english_name"
         android:textColorHint="@color/colorAccentLight"
-        android:inputType="textPassword"
+        android:inputType="text"
         android:imeOptions="actionDone"
         android:ellipsize="end"
         android:maxLines="1"
         android:windowSoftInputMode="adjustUnspecified"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:layout_gravity="bottom"
+            android:background="@null"
+            android:text="@string/class_id"
+            android:textColor="@color/colorAccentLight"
+            android:textStyle="normal"
+            android:textSize="18sp"/>
+
+        <Spinner
+            android:id="@+id/class_id_spinner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"/>
+
+    </LinearLayout>
+
     <Button
-        android:id="@+id/login_button"
+        android:id="@+id/submit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:background="@drawable/selector_button_tint"
-        android:text="@string/login"
+        android:text="@string/submit"
         android:textAlignment="center"
         android:textColor="@drawable/selector_text_button_tint"
         android:textStyle="normal"
@@ -98,42 +124,14 @@
         android:clickable="true"/>
 
     <TextView
-        android:id="@+id/sign_up_button"
+        android:id="@+id/back_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_marginTop="25dp"
         android:background="@null"
-        android:text="@string/sign_up_hint"
-        android:textColor="@drawable/selector_text_button_tint"
-        android:textStyle="normal"
-        android:textSize="15sp"
-        android:clickable="true"/>
-
-    <TextView
-        android:id="@+id/reset_password_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_marginTop="20dp"
-        android:background="@null"
-        android:text="@string/reset_password_hint"
-        android:textColor="@drawable/selector_text_button_tint"
-        android:textStyle="normal"
-        android:textSize="15sp"
-        android:clickable="true"/>
-
-    <TextView
-        android:id="@+id/offline_mode_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_marginTop="20dp"
-        android:background="@null"
-        android:text="@string/offline_mode"
+        android:text="@string/back"
         android:textColor="@drawable/selector_text_button_tint"
         android:textStyle="normal"
         android:textSize="15sp"

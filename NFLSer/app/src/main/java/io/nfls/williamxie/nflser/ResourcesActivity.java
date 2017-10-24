@@ -122,14 +122,14 @@ public class ResourcesActivity extends AppCompatActivity {
 
         list_resource_files.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(final AdapterView<?> adapterView, View view, int i, long l) {
                 ResourceFile file = mData.get(i);
                 if (file.isFolder()) {
                     lastDirectoryPath = currentDirectoryPath;
                     currentDirectoryPath = file.getHref();
-                    Log.d("isOnline", NFLSUtil.isNetworkAvailable(ResourcesActivity.this) + "");
+                    Log.d("isOnline", NFLSUtil.isOnline + "");
                     Log.d("CurDirPathWhenBack", currentDirectoryPath);
-                    if (NFLSUtil.isNetworkAvailable(ResourcesActivity.this)) {
+                    if (NFLSUtil.isOnline) {
                         goToDirectory(currentDirectoryPath);
                     } else {
                         goToLocalDirectory(currentDirectoryPath);
@@ -146,6 +146,7 @@ public class ResourcesActivity extends AppCompatActivity {
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         thread = new Thread(downloadFileTask);
                                         thread.start();
+                                        alertDialog.dismiss();
                                         alertDialog = new AlertDialog.Builder(ResourcesActivity.this)
                                                 .setTitle(R.string.downloading)
                                                 .setMessage(targetFile.getName())
@@ -153,13 +154,16 @@ public class ResourcesActivity extends AppCompatActivity {
                                                 .setPositiveButton(R.string.cancel, new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialogInterface, int i) {
+                                                        alertDialog.dismiss();
                                                         thread.interrupt();
                                                     }
                                                 })
+                                                .setCancelable(false)
                                                 .show();
                                     }
                                 })
                                 .setNegativeButton(R.string.cancel, null)
+                                .setCancelable(false)
                                 .show();
                     } else {
                         viewFile(file);
@@ -180,10 +184,11 @@ public class ResourcesActivity extends AppCompatActivity {
                             .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
+                                    alertDialog.dismiss();
                                     File localFile = new File(NFLSUtil.FILE_PATH_DOWNLOAD + file.getHref());
                                     localFile.delete();
                                     file.setDownloaded(false);
-                                    if (!NFLSUtil.isNetworkAvailable(ResourcesActivity.this)) {
+                                    if (!NFLSUtil.isOnline) {
                                         mData.remove(file);
                                     }
                                     refreshList();
@@ -192,9 +197,11 @@ public class ResourcesActivity extends AppCompatActivity {
                             .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
+                                    alertDialog.dismiss();
                                     return;
                                 }
                             })
+                            .setCancelable(false)
                             .show();
                 }
                 return true;
@@ -210,7 +217,7 @@ public class ResourcesActivity extends AppCompatActivity {
                     if (!lastDirectoryPath.equals("")) {
                         lastDirectoryPath = lastDirectoryPath.substring(0, lastDirectoryPath.lastIndexOf("/") + 1);
                     }
-                    if (NFLSUtil.isNetworkAvailable(ResourcesActivity.this)) {
+                    if (NFLSUtil.isOnline) {
                         goToDirectory(currentDirectoryPath);
                     } else {
                         goToLocalDirectory(currentDirectoryPath);
@@ -231,7 +238,7 @@ public class ResourcesActivity extends AppCompatActivity {
 
         NFLSUtil.verifyStoragePermissions(ResourcesActivity.this);
 
-        if (NFLSUtil.isNetworkAvailable(ResourcesActivity.this)) {
+        if (NFLSUtil.isOnline) {
             goToDirectory(currentDirectoryPath);
         } else {
             goToLocalDirectory(currentDirectoryPath);
@@ -248,8 +255,22 @@ public class ResourcesActivity extends AppCompatActivity {
     }
 
     private void goToDirectory(String directoryPath) {
-        alertDialog = new AlertDialog.Builder(ResourcesActivity.this).setMessage(R.string.loading).show();
-        new Thread(getDirectoryTask).start();
+        alertDialog = new AlertDialog.Builder(ResourcesActivity.this)
+                .setMessage(R.string.loading)
+                .setPositiveButton(R.string.offline_mode, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        alertDialog.dismiss();
+                        NFLSUtil.isOnline = false;
+                        thread.interrupt();
+                        goToLocalDirectory(currentDirectoryPath);
+                        return;
+                    }
+                })
+                .setCancelable(false)
+                .show();
+        thread = new Thread(getDirectoryTask);
+        thread.start();
     }
 
     private void goToLocalDirectory(String directoryPath) {
@@ -265,7 +286,8 @@ public class ResourcesActivity extends AppCompatActivity {
                     name = java.net.URLDecoder.decode(file.getName(), "utf-8");
                     path = file.getCanonicalPath();
                     path = path.substring(path.lastIndexOf("/download/") + 9);
-
+                    Log.d("DirPath", directoryPath);
+                    Log.d("DirPathComplete", dir.getCanonicalPath());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

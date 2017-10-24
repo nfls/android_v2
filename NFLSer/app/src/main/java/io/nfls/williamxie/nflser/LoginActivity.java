@@ -1,10 +1,12 @@
 package io.nfls.williamxie.nflser;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,9 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static io.nfls.williamxie.nflser.NFLSUtil.REQUEST_FAILED;
-import static io.nfls.williamxie.nflser.NFLSUtil.TOKEN_CORRECT;
-import static io.nfls.williamxie.nflser.NFLSUtil.TOKEN_WRONG;
+import static io.nfls.williamxie.nflser.NFLSUtil.*;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -32,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton = null;
     private TextView signUpButton = null;
     private TextView resetPasswordButton = null;
+    private TextView offlineModeButton = null;
 
     private String username = null;
     private String password = null;
@@ -46,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
             loginButton.setEnabled(true);
             signUpButton.setEnabled(true);
             resetPasswordButton.setEnabled(true);
+            offlineModeButton.setEnabled(true);
             if (jsonString.equals(REQUEST_FAILED)) {
                 Toast.makeText(LoginActivity.this, R.string.request_failed, Toast.LENGTH_SHORT).show();
                 clearPreferences();
@@ -74,28 +76,77 @@ public class LoginActivity extends AppCompatActivity {
             loginButton.setEnabled(true);
             signUpButton.setEnabled(true);
             resetPasswordButton.setEnabled(true);
+            offlineModeButton.setEnabled(true);
             Bundle data = msg.getData();
             String result = data.getString("result");
             if (result.equals(TOKEN_CORRECT)) {
                 //Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_LONG).show();
                 SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
-                Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.welcome) + " " + preferences.getString("username", "Unknown") + " !", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                startActivity(intent);
-            } else {
-
+                checkAuth();
             }
         }
     };
 
-    private Handler getUsernameHandler = new Handler() {
+    private Handler getAuthHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            Bundle data = msg.getData();
+            progressBar.setVisibility(View.INVISIBLE);
+            loginButton.setEnabled(true);
+            signUpButton.setEnabled(true);
+            resetPasswordButton.setEnabled(true);
+            offlineModeButton.setEnabled(true);
             SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
-            Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.welcome) + " " + preferences.getString("username", "Unknown") + " !", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+            SharedPreferences.Editor editor = preferences.edit();
+            String response = msg.getData().getString("response");
+            if (response == REQUEST_FAILED) {
+                Toast.makeText(LoginActivity.this, getString(R.string.phone_auth_activity_title) + " " + getString(R.string.request_failed), Toast.LENGTH_SHORT);
+            } else {
+                try {
+                    Log.d("JSON", response);
+                    JSONObject json = new JSONObject(response);
+                    json = json.getJSONObject("info");
+                    editor.putBoolean("hasPhoneAuth", json.getBoolean("phone"));
+                    try {
+                        editor.putBoolean("hasRealNameAuth", json.getInt("ic") != 0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        editor.putBoolean("hasRealNameAuth", json.getBoolean("ic"));
+                    }
+                    editor.commit();
+                    if (!preferences.getBoolean("hasPhoneAuth", false)) {
+                        AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this)
+                                .setTitle(R.string.warning)
+                                .setIcon(R.mipmap.nflsio)
+                                .setMessage(R.string.phone_auth_go_tip)
+                                .setCancelable(false)
+                                .setPositiveButton(R.string.go, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        startActivity(new Intent(LoginActivity.this, PhoneAuthActivity.class));
+                                    }
+                                })
+                                .show();
+                    } else if (!preferences.getBoolean("hasRealNameAuth", false)) {
+                        AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this)
+                                .setTitle(R.string.warning)
+                                .setIcon(R.mipmap.nflsio)
+                                .setMessage(R.string.real_name_auth_tip)
+                                .setCancelable(false)
+                                .setPositiveButton(R.string.go, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        startActivity(new Intent(LoginActivity.this, RealNameAuthActivity.class));
+                                    }
+                                })
+                                .show();
+                    } else {
+                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                        startActivity(intent);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     };
 
@@ -121,14 +172,22 @@ public class LoginActivity extends AppCompatActivity {
         }
     };
 
+    private Runnable getAuthTask = new Runnable() {
+        @Override
+        public void run() {
+            Message msg = new Message();
+            Bundle data = new Bundle();
+            data.putString("response", getAuth());
+            msg.setData(data);
+            getAuthHandler.sendMessage(msg);
+        }
+    };
+
     private Runnable getUsernameTask = new Runnable() {
         @Override
         public void run() {
             getUsername();
-            Message msg = new Message();
-            Bundle data = new Bundle();
-            msg.setData(data);
-            getUsernameHandler.sendMessage(msg);
+            checkAuth();
         }
     };
 
@@ -183,6 +242,15 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        offlineModeButton = (TextView) findViewById(R.id.offline_mode_button);
+        offlineModeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NFLSUtil.isOnline = false;
+                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+            }
+        });
+
         if (!NFLSUtil.isNetworkAvailable(LoginActivity.this)) {
             Toast.makeText(LoginActivity.this, R.string.offline, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
@@ -191,6 +259,7 @@ public class LoginActivity extends AppCompatActivity {
             loginButton.setEnabled(false);
             signUpButton.setEnabled(false);
             resetPasswordButton.setEnabled(false);
+            offlineModeButton.setEnabled(false);
             SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
             if (!preferences.getString("password", "fail").equals("fail")) {
                 SharedPreferences.Editor editor = preferences.edit();
@@ -305,6 +374,35 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private String getAuth() {
+        Log.d("GetAuth", "In");
+        String response = REQUEST_FAILED;
+        String token = getSharedPreferences("user", MODE_APPEND).getString("token", "No Token");
+        try {
+            URL url = new URL("https://api.nfls.io/center/auth?token=" + token);
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+
+            Log.d("GetAuth Response Code", responseCode + "");
+
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                response = NFLSUtil.inputStreamToString(connection.getInputStream());
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d("GetAuth Response", "Response");
+        return response;
+    }
+
     public void storeCookies(String token) {
         SharedPreferences preferences = getSharedPreferences("user", Context.MODE_APPEND);
         SharedPreferences.Editor editor = preferences.edit();
@@ -317,6 +415,12 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();
+    }
+
+    private void checkAuth() {
+        Log.d("CheckAuth", "In");
+        Log.d("CheckAuth", "Thread Start");
+        new Thread(getAuthTask).start();
     }
 
     public static String getRequestHeader(HttpsURLConnection conn) {
@@ -332,5 +436,11 @@ public class LoginActivity extends AppCompatActivity {
             sbRequestHeader.append("\n");
         }
         return sbRequestHeader.toString();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isOnline = isNetworkAvailable(LoginActivity.this);
     }
 }

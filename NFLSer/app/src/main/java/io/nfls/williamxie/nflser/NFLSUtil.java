@@ -7,13 +7,14 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class NFLSUtil {
+    public static boolean isOnline = false;
     public static final String TOKEN_CORRECT = "token_correct";
     public static final String TOKEN_WRONG = "token_wrong";
     public static final String REQUEST_FAILED = "request_failed";
@@ -44,6 +45,27 @@ public class NFLSUtil {
         }
         return false;
     }
+    /*
+    public static boolean isNetworkAvailable(Activity activity) {
+        ConnectivityManager CManager = (ConnectivityManager) activity.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo NInfo = CManager.getActiveNetworkInfo();
+        if (NInfo != null && NInfo.isConnectedOrConnecting()) {
+            try {
+                if (InetAddress.getByName("www.baidu.com").isReachable(5000)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+    */
     public static String inputStreamToString(InputStream in) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];

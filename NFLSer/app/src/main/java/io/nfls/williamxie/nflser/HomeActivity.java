@@ -1,8 +1,11 @@
 package io.nfls.williamxie.nflser;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -17,6 +20,7 @@ public class HomeActivity extends AppCompatActivity {
     private LinkedList<FunctionBlock> mData;
     private FunctionBlockAdapter mAdapter;
     private ListView list_function_block;
+    private SharedPreferences preferences;
     private boolean mIsExit;
 
     @Override
@@ -50,6 +54,21 @@ public class HomeActivity extends AppCompatActivity {
                 }
                 FunctionBlock block = mData.get(i - 1);
                 if (i == 1) {
+                    if (preferences.getBoolean("hasRealNameAuth", false)) {
+                        Toast.makeText(HomeActivity.this, R.string.resources_closed_tip, Toast.LENGTH_SHORT).show();
+                        AlertDialog alertDialog = new AlertDialog.Builder(HomeActivity.this)
+                                .setTitle(R.string.warning)
+                                .setIcon(R.mipmap.nflsio)
+                                .setMessage(R.string.real_name_auth_tip)
+                                .setCancelable(false)
+                                .setPositiveButton(R.string.go, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        startActivity(new Intent(HomeActivity.this, RealNameAuthActivity.class));
+                                    }
+                                })
+                                .show();
+                    }
                     Toast.makeText(HomeActivity.this, block.getName(), Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(HomeActivity.this, ResourcesActivity.class));
                 } else {
@@ -73,6 +92,8 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
+        preferences = getSharedPreferences("user", MODE_APPEND);
+        Toast.makeText(HomeActivity.this, getString(R.string.welcome) + " " + preferences.getString("username", "Unknown") + " !", Toast.LENGTH_SHORT).show();
     }
 
     @Override

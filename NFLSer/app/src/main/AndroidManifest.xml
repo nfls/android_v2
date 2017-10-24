@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="io.nfls.williamxie.nflser.LoginActivity"
+            android:name=".LoginActivity"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -23,17 +23,21 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="io.nfls.williamxie.nflser.HomeActivity">
+        <activity android:name=".HomeActivity">
         </activity>
-        <activity android:name="io.nfls.williamxie.nflser.SignUpActivity">
+        <activity android:name=".SignUpActivity">
         </activity>
-        <activity android:name="io.nfls.williamxie.nflser.ResetPasswordActivity">
+        <activity android:name=".ResetPasswordActivity">
         </activity>
-        <activity android:name="io.nfls.williamxie.nflser.ResourcesActivity">
+        <activity android:name=".ResourcesActivity">
         </activity>
-        <activity android:name="io.nfls.williamxie.nflser.PdfViewerActivity">
+        <activity android:name=".PdfViewerActivity">
         </activity>
-        <activity android:name="io.nfls.williamxie.nflser.ImageViewerActivity">
+        <activity android:name=".ImageViewerActivity">
+        </activity>
+        <activity android:name=".RealNameAuthActivity">
+        </activity>
+        <activity android:name=".PhoneAuthActivity">
         </activity>
     </application>
 

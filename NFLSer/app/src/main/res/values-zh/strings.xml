@@ -49,4 +49,24 @@
     <string name="download_tip">是否下载该文件到本地 ?</string>
     <string name="download">下载</string>
     <string name="confirm">确认</string>
+    <string name="version"></string>
+    <string name="offline_mode">离线模式</string>
+    <string name="name_confirm_back_tip">请先完成实名认证</string>
+    <string name="real_name_auth_activity_title">实名认证</string>
+    <string name="submit">提交</string>
+    <string name="chinese_name">中文名</string>
+    <string name="class_id">班级号</string>
+    <string name="english_name">英文名</string>
+    <string name="back">返回</string>
+    <string name="exit">退出</string>
+    <string name="phone_auth_activity_title">手机号绑定</string>
+    <string name="send">发送</string>
+    <string name="send_verification_code">发送验证码</string>
+    <string name="send_for_verification_code_failed_tip">请检查手机是否已被使用</string>
+    <string name="succeed">成功 !</string>
+    <string name="failed">失败 !</string>
+    <string name="go">前往</string>
+    <string name="resources_closed_tip">请先完成实名认证 !</string>
+    <string name="phone_auth_go_tip">你还没有完成手机号绑定. 完成手机号绑定以启用[资源中心]功能.</string>
+    <string name="real_name_auth_tip">你还没有完成实名认证. 完成实名认证以启用[资源中心]功能.</string>
 </resources>

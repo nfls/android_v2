@@ -31,13 +31,13 @@
                 android:clickable="true"/>
 
             <TextView
-                android:id="@+id/login_title"
+                android:id="@+id/phone_auth_title"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="5"
                 android:layout_gravity="center"
                 android:background="@null"
-                android:text="@string/login_activity_title"
+                android:text="@string/phone_auth_activity_title"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textStyle="bold"
@@ -57,40 +57,66 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <EditText
-        android:id="@+id/input_username"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:hint="@string/username"
-        android:textColorHint="@color/colorAccentLight"
-        android:inputType="text"
-        android:imeOptions="actionNext"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:windowSoftInputMode="adjustUnspecified"/>
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <EditText
+            android:id="@+id/input_phone_number"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:hint="@string/phone_number"
+            android:textColorHint="@color/colorAccentLight"
+            android:inputType="phone"
+            android:imeOptions="actionNext"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:windowSoftInputMode="adjustUnspecified"/>
+
+        <Button
+            android:id="@+id/send_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_gravity="center"
+            android:background="@drawable/selector_button_tint"
+            android:text="@string/send_verification_code"
+            android:textAlignment="center"
+            android:textColor="@drawable/selector_text_button_tint"
+            android:textStyle="normal"
+            android:textSize="18sp"
+            android:clickable="true"/>
+
+    </LinearLayout>
 
     <EditText
-        android:id="@+id/input_password"
+        android:id="@+id/input_verification_code"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:hint="@string/password"
+        android:hint="@string/verification_code"
         android:textColorHint="@color/colorAccentLight"
-        android:inputType="textPassword"
+        android:inputType="number"
         android:imeOptions="actionDone"
         android:ellipsize="end"
         android:maxLines="1"
         android:windowSoftInputMode="adjustUnspecified"/>
 
     <Button
-        android:id="@+id/login_button"
+        android:id="@+id/submit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:background="@drawable/selector_button_tint"
-        android:text="@string/login"
+        android:text="@string/submit"
         android:textAlignment="center"
         android:textColor="@drawable/selector_text_button_tint"
         android:textStyle="normal"
@@ -98,42 +124,14 @@
         android:clickable="true"/>
 
     <TextView
-        android:id="@+id/sign_up_button"
+        android:id="@+id/back_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_marginTop="25dp"
         android:background="@null"
-        android:text="@string/sign_up_hint"
-        android:textColor="@drawable/selector_text_button_tint"
-        android:textStyle="normal"
-        android:textSize="15sp"
-        android:clickable="true"/>
-
-    <TextView
-        android:id="@+id/reset_password_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_marginTop="20dp"
-        android:background="@null"
-        android:text="@string/reset_password_hint"
-        android:textColor="@drawable/selector_text_button_tint"
-        android:textStyle="normal"
-        android:textSize="15sp"
-        android:clickable="true"/>
-
-    <TextView
-        android:id="@+id/offline_mode_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_marginTop="20dp"
-        android:background="@null"
-        android:text="@string/offline_mode"
+        android:text="@string/back"
         android:textColor="@drawable/selector_text_button_tint"
         android:textStyle="normal"
         android:textSize="15sp"

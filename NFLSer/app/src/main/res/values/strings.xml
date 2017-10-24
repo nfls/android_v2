@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">NFLSer</string>
+    <string name="version">0.0.3</string>
 
     <string name="developer">GuardHei</string>
     <string name="home">Home</string>
@@ -14,6 +15,8 @@
     <string name="news">News</string>
 
     <string name="login_activity_title">Login</string>
+    <string name="real_name_auth_activity_title">Real Name Auth.</string>
+    <string name="phone_auth_activity_title">Phone Auth.</string>
     <string name="sign_up_activity_title">Sign-Up</string>
     <string name="reset_password_activity_title">Reset-Password</string>
 
@@ -27,6 +30,7 @@
     <string name="reset_password_hint">Forget the password ？</string>
     <string name="request_failed">Request Failed</string>
     <string name="offline">No Internet Detected</string>
+    <string name="offline_mode">Offline Mode</string>
     <string name="welcome">Welcome,</string>
     <string name="operation_succeed">Operation Succeed</string>
     <string name="email_address">Email Address</string>
@@ -36,6 +40,7 @@
     <string name="phone_number">Phone Number</string>
     <string name="verification_code">Verification Code</string>
     <string name="send_email_success">Send Email Successfully</string>
+    <string name="exit">Exit</string>
     <string name="exit_tip">Press Again to Exit</string>
     <string name="cached">Cached</string>
     <string name="loading">Loading ...</string>
@@ -47,9 +52,23 @@
     <string name="delete">Delete</string>
     <string name="download">Download</string>
     <string name="confirm">Confirm</string>
+    <string name="submit">Submit</string>
+    <string name="send">Send</string>
     <string name="cancel">Cancel</string>
     <string name="unsupported_tip">Do not support file type</string>
-
+    <string name="name_confirm_back_tip">Please finish Real-name Authentication first</string>
+    <string name="chinese_name">Chinese Name</string>
+    <string name="english_name">English Name</string>
+    <string name="class_id">Class ID</string>
+    <string name="back">Back</string>
+    <string name="send_verification_code">Send Vrf. Code</string>
+    <string name="send_for_verification_code_failed_tip">Please check whether the phone has been used.</string>
+    <string name="succeed">Succeed !</string>
+    <string name="failed">Failed !</string>
+    <string name="phone_auth_go_tip">You haven\'t finish Phone Auth. yet. Please complete it to enable Resources Function.</string>
+    <string name="real_name_auth_tip">You haven\'t finish Real Name Auth. yet. Please complete it to enable Resources Function.</string>
     <string name="func_bloc_list_header">Function Blocks</string>
     <string name="func_bloc_list_footer">Buy Us a Coffee !</string>
+    <string name="go">Go</string>
+    <string name="resources_closed_tip">Please complete Real Name Auth first !</string>
 </resources>
