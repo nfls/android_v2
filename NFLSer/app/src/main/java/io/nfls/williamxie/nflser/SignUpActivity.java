@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -135,7 +136,7 @@ public class SignUpActivity extends AppCompatActivity {
         input_email.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
                 String prefix = null;
-                if (input_email.getText().toString().matches("[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+") && s.length() > 0) {
+                if (input_email.getText().toString().matches("[a-zA-Z0-9._-]+@[a-zA-Z0-9]+\\.+[a-z]+") && s.length() > 0) {
                     prefix = getString(R.string.valid);
                 }
                 else {
@@ -185,14 +186,20 @@ public class SignUpActivity extends AppCompatActivity {
             connection.setReadTimeout(5000);
             connection.setRequestMethod("POST");
 
-            String data = "username=" + username + "&password=" + password + "&email=" + email + "&session=app";
+            //String data = "username=" + username + "&password=" + password + "&email=" + email + "&session=app";
 
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            connection.setRequestProperty("Content-Length", data.length()+"");
+            //connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Type", "application/json");
+
+            JSONObject data = new JSONObject();
+            data.put("username", username);
+            data.put("password", password);
+            data.put("email", email);
+            data.put("session", "app");
 
             connection.setDoOutput(true);
-            OutputStream outputStream = connection.getOutputStream();
-            outputStream.write(data.getBytes());
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            out.writeBytes(data.toString());
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpsURLConnection.HTTP_OK) {
@@ -204,6 +211,8 @@ public class SignUpActivity extends AppCompatActivity {
         } catch (ProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return json;
