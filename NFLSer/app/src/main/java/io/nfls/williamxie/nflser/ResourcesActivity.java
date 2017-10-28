@@ -11,10 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +21,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.LinkedList;
 
 public class ResourcesActivity extends AppCompatActivity {
@@ -34,6 +32,7 @@ public class ResourcesActivity extends AppCompatActivity {
     private LinkedList<ResourceFile> mData;
     private ResourceFileAdapter mAdapter;
     private ListView list_resource_files;
+    private TextView currentDirectoryText;
     private AlertDialog alertDialog = null;
 
     private ResourceFile targetFile = null;
@@ -236,6 +235,8 @@ public class ResourcesActivity extends AppCompatActivity {
             }
         });
 
+        currentDirectoryText = (TextView) findViewById(R.id.current_directory_text);
+
         NFLSUtil.verifyStoragePermissions(ResourcesActivity.this);
 
         if (NFLSUtil.isOnline) {
@@ -255,6 +256,11 @@ public class ResourcesActivity extends AppCompatActivity {
     }
 
     private void goToDirectory(String directoryPath) {
+        try {
+            currentDirectoryText.setText(URLDecoder.decode(currentDirectoryPath, "utf-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         alertDialog = new AlertDialog.Builder(ResourcesActivity.this)
                 .setMessage(R.string.loading)
                 .setPositiveButton(R.string.offline_mode, new DialogInterface.OnClickListener() {
@@ -274,6 +280,11 @@ public class ResourcesActivity extends AppCompatActivity {
     }
 
     private void goToLocalDirectory(String directoryPath) {
+        try {
+            currentDirectoryText.setText(URLDecoder.decode(currentDirectoryPath, "utf-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         LinkedList<ResourceFile> mData = new LinkedList<ResourceFile>();
         File dir = new File(NFLSUtil.FILE_PATH_DOWNLOAD + directoryPath);
         File[] files = dir.listFiles();

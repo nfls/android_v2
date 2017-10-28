@@ -86,7 +86,7 @@ public class PhoneAuthActivity extends AppCompatActivity {
             data.putBoolean("response", sendVerificationCodeAuth());
             Message msg = new Message();
             msg.setData(data);
-            sendForVerificationCodeHandler.sendMessage(msg);
+            sendVerificationCodeAuthHandler.sendMessage(msg);
         }
     };
 

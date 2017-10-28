@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
@@ -77,11 +78,12 @@ public class LoginActivity extends AppCompatActivity {
             signUpButton.setEnabled(true);
             resetPasswordButton.setEnabled(true);
             offlineModeButton.setEnabled(true);
+            progressBar.setVisibility(View.INVISIBLE);
             Bundle data = msg.getData();
             String result = data.getString("result");
+            Log.d("result", result);
             if (result.equals(TOKEN_CORRECT)) {
                 //Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_LONG).show();
-                SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
                 checkAuth();
             }
         }
@@ -90,6 +92,7 @@ public class LoginActivity extends AppCompatActivity {
     private Handler getAuthHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            super.handleMessage(msg);
             progressBar.setVisibility(View.INVISIBLE);
             loginButton.setEnabled(true);
             signUpButton.setEnabled(true);
@@ -107,12 +110,15 @@ public class LoginActivity extends AppCompatActivity {
                     json = json.getJSONObject("info");
                     editor.putBoolean("hasPhoneAuth", json.getBoolean("phone"));
                     try {
-                        editor.putBoolean("hasRealNameAuth", json.getInt("ic") != 0);
+                        editor.putBoolean("hasRealNameAuth", json.getInt("ic") == 1);
                     } catch (Exception e) {
                         e.printStackTrace();
                         editor.putBoolean("hasRealNameAuth", json.getBoolean("ic"));
                     }
-                    editor.commit();
+                    finally {
+                        editor.commit();
+                    }
+                    Log.d("hasRealNameAuth", preferences.getBoolean("hasRealNameAuth", false) + "");
                     if (!preferences.getBoolean("hasPhoneAuth", false)) {
                         AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this)
                                 .setTitle(R.string.warning)
@@ -140,8 +146,54 @@ public class LoginActivity extends AppCompatActivity {
                                 })
                                 .show();
                     } else {
+                        finish();
                         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                         startActivity(intent);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
+
+    private Handler postVersionCheckHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            progressBar.setVisibility(View.INVISIBLE);
+            loginButton.setEnabled(true);
+            signUpButton.setEnabled(true);
+            resetPasswordButton.setEnabled(true);
+            offlineModeButton.setEnabled(true);
+            String response = msg.getData().getString("response");
+            //Log.d("response", response);
+            if (response.equals(NFLSUtil.REQUEST_FAILED)) {
+                Toast.makeText(LoginActivity.this, getString(R.string.request_failed), Toast.LENGTH_SHORT);
+            } else {
+                try {
+                    JSONObject json = new JSONObject(response);
+                    if (json.getInt("code") != HttpsURLConnection.HTTP_OK) {
+                        final String url = json.getString("info");
+                        AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this)
+                                .setTitle(R.string.warning)
+                                .setIcon(R.mipmap.nflsio)
+                                .setMessage(R.string.version_too_old_tip)
+                                .setCancelable(false)
+                                .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        Intent intent = new Intent();
+                                        intent.setAction("android.intent.action.VIEW");
+                                        Uri content_url = Uri.parse(url);
+                                        intent.setData(content_url);
+                                        startActivity(intent);
+                                    }
+                                })
+                                .show();
+                    } else {
+                        progressBar.setVisibility(View.VISIBLE);
+                        new Thread(autoLoginTask).start();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -188,6 +240,17 @@ public class LoginActivity extends AppCompatActivity {
         public void run() {
             getUsername();
             checkAuth();
+        }
+    };
+
+    private Runnable postVersionCheckTask = new Runnable() {
+        @Override
+        public void run() {
+            Message msg = new Message();
+            Bundle data = new Bundle();
+            data.putString("response", postVersionCheck());
+            msg.setData(data);
+            postVersionCheckHandler.sendMessage(msg);
         }
     };
 
@@ -259,7 +322,7 @@ public class LoginActivity extends AppCompatActivity {
             loginButton.setEnabled(false);
             signUpButton.setEnabled(false);
             resetPasswordButton.setEnabled(false);
-            offlineModeButton.setEnabled(false);
+            //offlineModeButton.setEnabled(false);
             SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
             if (!preferences.getString("password", "fail").equals("fail")) {
                 SharedPreferences.Editor editor = preferences.edit();
@@ -270,7 +333,8 @@ public class LoginActivity extends AppCompatActivity {
                 input_password.setText(password);
                 new Thread(loginTask).start();
             } else {
-                new Thread(autoLoginTask).start();
+                progressBar.setVisibility(View.VISIBLE);
+                checkVersion();
             }
         }
     }
@@ -318,6 +382,7 @@ public class LoginActivity extends AppCompatActivity {
             connection.setReadTimeout(5000);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Cookie", " token=" + token);
+            connection.setRequestProperty("User-Agent", "Nflsers-Android");
             Log.d("Token", token);
 
             int responseCode = connection.getResponseCode();
@@ -403,6 +468,43 @@ public class LoginActivity extends AppCompatActivity {
         return response;
     }
 
+    private String postVersionCheck() {
+        String response = REQUEST_FAILED;
+        try {
+            URL url = new URL("https://api.nfls.io/device/android");
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            //connection.setRequestProperty("Cookie", getSharedPreferences("user", MODE_APPEND).getString("token", "No Token"));
+
+            JSONObject data = new JSONObject();
+            data.put("version", getString(R.string.version));
+
+            connection.setDoOutput(true);
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            Log.d("data", data.toString());
+            out.writeBytes(data.toString());
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                InputStream in = connection.getInputStream();
+                response = NFLSUtil.inputStreamToString(in);
+                Log.d("response", response);
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
     public void storeCookies(String token) {
         SharedPreferences preferences = getSharedPreferences("user", Context.MODE_APPEND);
         SharedPreferences.Editor editor = preferences.edit();
@@ -421,6 +523,10 @@ public class LoginActivity extends AppCompatActivity {
         Log.d("CheckAuth", "In");
         Log.d("CheckAuth", "Thread Start");
         new Thread(getAuthTask).start();
+    }
+
+    private void checkVersion() {
+        new Thread(postVersionCheckTask).start();
     }
 
     public static String getRequestHeader(HttpsURLConnection conn) {
@@ -442,5 +548,8 @@ public class LoginActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         isOnline = isNetworkAvailable(LoginActivity.this);
+        if (isOnline) {
+            checkVersion();
+        }
     }
 }

@@ -8,6 +8,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,7 +55,8 @@ public class HomeActivity extends AppCompatActivity {
                 }
                 FunctionBlock block = mData.get(i - 1);
                 if (i == 1) {
-                    if (preferences.getBoolean("hasRealNameAuth", false)) {
+                    Log.d("Choice", preferences.getBoolean("hasRealNameAuth", false) + "");
+                    if (!preferences.getBoolean("hasRealNameAuth", false)) {
                         Toast.makeText(HomeActivity.this, R.string.resources_closed_tip, Toast.LENGTH_SHORT).show();
                         AlertDialog alertDialog = new AlertDialog.Builder(HomeActivity.this)
                                 .setTitle(R.string.warning)
@@ -64,13 +66,18 @@ public class HomeActivity extends AppCompatActivity {
                                 .setPositiveButton(R.string.go, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
-                                        startActivity(new Intent(HomeActivity.this, RealNameAuthActivity.class));
+                                        if (preferences.getBoolean("hasPhoneAuth", false)) {
+                                            startActivity(new Intent(HomeActivity.this, RealNameAuthActivity.class));
+                                        } else {
+                                            startActivity(new Intent(HomeActivity.this, PhoneAuthActivity.class));
+                                        }
                                     }
                                 })
                                 .show();
+                    } else {
+                        Toast.makeText(HomeActivity.this, block.getName(), Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(HomeActivity.this, ResourcesActivity.class));
                     }
-                    Toast.makeText(HomeActivity.this, block.getName(), Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(HomeActivity.this, ResourcesActivity.class));
                 } else {
                     Toast.makeText(HomeActivity.this, R.string.close_tip, Toast.LENGTH_SHORT).show();
                 }

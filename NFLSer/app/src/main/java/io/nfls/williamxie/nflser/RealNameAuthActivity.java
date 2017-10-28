@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class RealNameAuthActivity extends AppCompatActivity {
 
-    private static String[] classIDs = {"PRE IB 1", "PRE IB 2", "PAL 1", "PAL 2", "DP 1-1", "DP 1-2", "AS 1-1", "AS 1-2", "DP 2-1", "DP 2-2", "A2 2-1", "A2 2-2", "Teacher", "Main Campus"};
+    private static String[] classIDs = {"PRE IB 1", "PRE IB 2", "PAL 1", "PAL 2", "DP1 1", "DP1 2", "AS 1", "AS 2", "DP2 1", "DP2 2", "A2 1", "A2 2", "Teacher", "Main Campus"};
     private String chinese_name = null;
     private String english_name = null;
     private String classID = classIDs[0];
