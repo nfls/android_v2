@@ -11,6 +11,8 @@ import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URLDecoder;
 
 public class PdfViewerActivity extends AppCompatActivity {
 
@@ -59,7 +61,12 @@ public class PdfViewerActivity extends AppCompatActivity {
                     }
                 })
                 .load();
-        String title = file.getName();
+        String title = null;
+        try {
+            title = URLDecoder.decode(file.getName(), "utf-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (title.length() > 10) {
             title = title.substring(0, 11) + " ...";
         }
