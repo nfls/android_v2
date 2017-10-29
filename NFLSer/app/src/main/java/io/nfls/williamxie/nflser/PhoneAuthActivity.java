@@ -37,10 +37,11 @@ public class PhoneAuthActivity extends AppCompatActivity {
             backButton.setEnabled(true);
             progressBar.setVisibility(View.INVISIBLE);
             boolean success = msg.getData().getBoolean("response");
+            Log.d("success", success + "");
             if (success) {
-                Toast.makeText(PhoneAuthActivity.this, getString(R.string.phone_auth_activity_title) + " " + getString(R.string.succeed), Toast.LENGTH_SHORT);
+                Toast.makeText(PhoneAuthActivity.this, getString(R.string.send_verification_code) + " " + getString(R.string.succeed), Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(PhoneAuthActivity.this, getString(R.string.request_failed) + "\n" + getString(R.string.send_for_verification_code_failed_tip), Toast.LENGTH_SHORT);
+                Toast.makeText(PhoneAuthActivity.this, getString(R.string.request_failed) + "\n" + getString(R.string.send_for_verification_code_failed_tip), Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -176,6 +177,7 @@ public class PhoneAuthActivity extends AppCompatActivity {
     }
 
     private String postPhoneRequest(String jsonString) {
+        Log.d("jsonString", jsonString);
         String response = NFLSUtil.REQUEST_FAILED;
         try {
             URL url = new URL("https://api.nfls.io/center/phone");
@@ -184,13 +186,13 @@ public class PhoneAuthActivity extends AppCompatActivity {
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
             connection.setDoOutput(true);
-            connection.setDoInput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Cookie", "token=" + getSharedPreferences("user", MODE_APPEND).getString("token", "No Token"));
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
             out.writeBytes(jsonString);
 
             int responseCode = connection.getResponseCode();
-            Log.d("ResponseCode", responseCode + "");
+            Log.d("PhoneAuthResponseCode", responseCode + "");
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 InputStream in = connection.getInputStream();
                 response = NFLSUtil.inputStreamToString(in);
