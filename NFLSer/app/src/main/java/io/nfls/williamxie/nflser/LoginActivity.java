@@ -1,5 +1,6 @@
 package io.nfls.williamxie.nflser;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -51,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
             offlineModeButton.setEnabled(true);
             if (jsonString.equals(REQUEST_FAILED)) {
                 Toast.makeText(LoginActivity.this, R.string.request_failed, Toast.LENGTH_SHORT).show();
-                clearPreferences();
+                clearPreferences(LoginActivity.this);
             } else {
                 JSONObject json = null;
                 try {
@@ -61,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
                         new Thread(getUsernameTask).start();
                     } else {
                         Toast.makeText(LoginActivity.this, json.getJSONObject("info").getString("message"), Toast.LENGTH_SHORT).show();
-                        clearPreferences();
+                        clearPreferences(LoginActivity.this);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -340,12 +341,18 @@ public class LoginActivity extends AppCompatActivity {
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
             connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
 
-            String data = "username=" + username + "&password=" + password + "&session=app";
+            //String data = "username=" + java.net.URLEncoder.encode(username, "utf-8") + "&password=" + java.net.URLEncoder.encode(password, "utf-8") + "&session=app";
+
+            JSONObject data = new JSONObject();
+            data.put("username", java.net.URLEncoder.encode(username, "utf-8"));
+            data.put("password", java.net.URLEncoder.encode(password, "utf-8"));
+            data.put("session", "app");
 
             connection.setDoOutput(true);
-            OutputStream outputStream = connection.getOutputStream();
-            outputStream.write(data.getBytes());
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            out.writeBytes(data.toString());
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpsURLConnection.HTTP_OK) {
@@ -358,6 +365,8 @@ public class LoginActivity extends AppCompatActivity {
         } catch (ProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return json;
@@ -473,7 +482,7 @@ public class LoginActivity extends AppCompatActivity {
             //connection.setRequestProperty("Cookie", getSharedPreferences("user", MODE_APPEND).getString("token", "No Token"));
 
             JSONObject data = new JSONObject();
-            data.put("version", getString(R.string.version));
+            data.put("version", getString(R.string.version_no));
 
             connection.setDoOutput(true);
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
@@ -505,8 +514,8 @@ public class LoginActivity extends AppCompatActivity {
         editor.commit();
     }
 
-    private void clearPreferences() {
-        SharedPreferences preferences = getSharedPreferences("user", Context.MODE_APPEND);
+    public static void clearPreferences(Activity activity) {
+        SharedPreferences preferences = activity.getSharedPreferences("user", Context.MODE_APPEND);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();

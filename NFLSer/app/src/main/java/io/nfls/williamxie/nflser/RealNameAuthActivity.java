@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class RealNameAuthActivity extends AppCompatActivity {
 
-    private static String[] classIDs = {"PRE IB 1", "PRE IB 2", "PAL 1", "PAL 2", "DP1 1", "DP1 2", "AS 1", "AS 2", "DP2 1", "DP2 2", "A2 1", "A2 2", "Teacher", "Main Campus"};
+    private static String[] classIDs = {"PRE IB 1", "PRE IB 2", "PAL 1", "PAL 2", "DP1 1", "DP1 2", "AS 1", "AS 2", "DP2 1", "DP2 2", "A2 1", "A2 2", "Teacher", "Main Campus", "Alumni"};
     private String chinese_name = null;
     private String english_name = null;
     private String classID = classIDs[0];
@@ -49,14 +49,14 @@ public class RealNameAuthActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putBoolean("hasRealNameAuth", false);
                 editor.commit();
-                finish();
-                startActivity(new Intent(RealNameAuthActivity.this, HomeActivity.class));
             } else {
                 Toast.makeText(RealNameAuthActivity.this, R.string.operation_succeed, Toast.LENGTH_SHORT).show();
                 SharedPreferences preferences = getSharedPreferences("user", MODE_APPEND);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putBoolean("hasRealNameAuth", true);
                 editor.commit();
+                finish();
+                startActivity(new Intent(RealNameAuthActivity.this, HomeActivity.class));
             }
         }
     };
@@ -137,12 +137,15 @@ public class RealNameAuthActivity extends AppCompatActivity {
             connection.setReadTimeout(5000);
             connection.setConnectTimeout(5000);
             connection.setRequestMethod("POST");
-            connection.setRequestProperty("Cookies", " token" + token);
+            connection.setRequestProperty("Cookie", " token=" + token);
+            connection.setRequestProperty("Content-Type", "application/json");
 
             JSONObject data = new JSONObject();
-            data.put("chnName", chinese_name);
-            data.put("engName", english_name);
-            data.put("tmpClass", classID);
+            data.put("chnName", java.net.URLEncoder.encode(chinese_name, "utf-8"));
+            data.put("engName", java.net.URLEncoder.encode(english_name, "utf-8"));
+            data.put("tmpClass", java.net.URLEncoder.encode(classID, "utf-8"));
+
+            Log.d("Data", data.toString());
 
             connection.setDoOutput(true);
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
@@ -151,6 +154,8 @@ public class RealNameAuthActivity extends AppCompatActivity {
             out.close();
 
             responseCode = connection.getResponseCode();
+
+            Log.d("ResponseCode For R.N.A ", responseCode + "");
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -201,8 +206,8 @@ public class RealNameAuthActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://api.nfls.io/center/auth?token=" + token);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setReadTimeout(5000);
-            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(30000);
+            connection.setConnectTimeout(30000);
             connection.setRequestMethod("GET");
             connection.setDoOutput(true);
             int responseCode = connection.getResponseCode();

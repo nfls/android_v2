@@ -27,7 +27,7 @@
     <string name="login_hint">已经有一个账户 ？</string>
     <string name="reset_password">发送电子邮件</string>
     <string name="sign_up">注册</string>
-    <string name="developer">嘿侍</string>
+    <string name="developer">开发者</string>
     <string name="invalid">无效的</string>
     <string name="valid">有效的</string>
     <string name="email_address_hint">请注意格式</string>
@@ -71,4 +71,10 @@
     <string name="verison_check">版本检测</string>
     <string name="version_too_old_tip">应用版本过低, 请更新以继续使用</string>
     <string name="update">更新</string>
+    <string name="about">关于</string>
+    <string name="settings">设置</string>
+    <string name="log_out">注销</string>
+    <string name="developer_name">嘿侍</string>
+    <string name="version">版本</string>
+    <string name="say_thanks_to">多谢</string>
 </resources>

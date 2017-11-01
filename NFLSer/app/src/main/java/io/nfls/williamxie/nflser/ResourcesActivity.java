@@ -385,24 +385,28 @@ public class ResourcesActivity extends AppCompatActivity {
     private String getDirectory() {
         String json = NFLSUtil.REQUEST_FAILED;
         String token = getSharedPreferences("user", MODE_APPEND).getString("token", "No Token");
+        System.err.println("Token " + token);
         try {
             URL url = new URL("https://dl.nfls.io/?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(30000);
+            connection.setReadTimeout(30000);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Cookie", " token=" + token);
             connection.setDoOutput(true);
 
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-            out.writeBytes(packJson().toString());
+            JSONObject data = packJson();
+            System.err.println("Data For R " + data.toString());
+            out.writeBytes(data.toString());
             out.flush();
             out.close();
-
             int responseCode = connection.getResponseCode();
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
-                json = new JSONObject(NFLSUtil.inputStreamToString(connection.getInputStream())).toString();
+                String jsonString = (NFLSUtil.inputStreamToString(connection.getInputStream()));
+                System.err.println("JsonString for directory is " + jsonString);
+                json = new JSONObject(jsonString).toString();
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -423,8 +427,8 @@ public class ResourcesActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://dl.nfls.io" + targetFile.getHref());
             connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(30000);
+            connection.setReadTimeout(30000);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Cookie", " token=" + token);
             Log.d("URL", url.toString());

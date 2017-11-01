@@ -182,8 +182,8 @@ public class SignUpActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://api.nfls.io/center/register?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(30000);
+            connection.setReadTimeout(30000);
             connection.setRequestMethod("POST");
 
             //String data = "username=" + username + "&password=" + password + "&email=" + email + "&session=app";
@@ -192,8 +192,8 @@ public class SignUpActivity extends AppCompatActivity {
             connection.setRequestProperty("Content-Type", "application/json");
 
             JSONObject data = new JSONObject();
-            data.put("username", username);
-            data.put("password", password);
+            data.put("username", java.net.URLEncoder.encode(username, "utf-8"));
+            data.put("password", java.net.URLEncoder.encode(password, "utf-8"));
             data.put("email", email);
             data.put("session", "app");
 
@@ -205,6 +205,8 @@ public class SignUpActivity extends AppCompatActivity {
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 InputStream in = connection.getInputStream();
                 json = NFLSUtil.inputStreamToString(in);
+                Log.d("Data", data.toString());
+                Log.d("Json", json);
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();

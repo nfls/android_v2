@@ -14,7 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -59,7 +61,7 @@ public class HomeActivity extends AppCompatActivity {
                     if (NFLSUtil.isOnline) {
                         if (!preferences.getBoolean("hasRealNameAuth", false)) {
                             Toast.makeText(HomeActivity.this, R.string.resources_closed_tip, Toast.LENGTH_SHORT).show();
-                            AlertDialog alertDialog = new AlertDialog.Builder(HomeActivity.this)
+                            new AlertDialog.Builder(HomeActivity.this)
                                     .setTitle(R.string.warning)
                                     .setIcon(R.mipmap.nflsio)
                                     .setMessage(R.string.real_name_auth_tip)
@@ -75,10 +77,14 @@ public class HomeActivity extends AppCompatActivity {
                                         }
                                     })
                                     .show();
+                        } else {
+                            //Toast.makeText(HomeActivity.this, block.getName(), Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(HomeActivity.this, ResourcesActivity.class));
                         }
+                    } else {
+                        Toast.makeText(HomeActivity.this, block.getName(), Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(HomeActivity.this, ResourcesActivity.class));
                     }
-                    Toast.makeText(HomeActivity.this, block.getName(), Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(HomeActivity.this, ResourcesActivity.class));
                 } else {
                     Toast.makeText(HomeActivity.this, R.string.close_tip, Toast.LENGTH_SHORT).show();
                 }
@@ -93,11 +99,46 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        ImageView settings_icon = (ImageView) findViewById(R.id.settings_icon);
+        final ImageView settings_icon = (ImageView) findViewById(R.id.settings_icon);
         settings_icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                ArrayList options = new ArrayList<String>();
+                options.add(getString(R.string.settings));
+                options.add(getString(R.string.about));
+                options.add(getString(R.string.log_out));
+                View popupView = HomeActivity.this.getLayoutInflater().inflate(R.layout.window_popup_settings, null);
+                ListView listView = (ListView) popupView.findViewById(R.id.list_view_popup);
+                listView.setAdapter(new ArrayAdapter<String>(HomeActivity.this, R.layout.item_list_settings, options));
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        switch (i) {
+                            case 0: break;
+                            case 1: {
+                                new AlertDialog.Builder(HomeActivity.this)
+                                        .setIcon(R.mipmap.nflsio)
+                                        .setTitle(R.string.about)
+                                        .setMessage(getString(R.string.developer) + ": " + getString(R.string.developer_name) + "\n" + getString(R.string.version) + ": " + getString(R.string.version_no))
+                                        .setPositiveButton(getString(R.string.say_thanks_to) + " " + getString(R.string.developer_name), null)
+                                        .setCancelable(true)
+                                        .show();
+                                break;
+                            }
+                            case 2: {
+                                Toast.makeText(HomeActivity.this, R.string.operation_succeed, Toast.LENGTH_SHORT).show();
+                                LoginActivity.clearPreferences(HomeActivity.this);
+                                startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+                                break;
+                            }
+                        }
+                    }
+                });
+                PopupWindow popupWindow = new PopupWindow(popupView, 200, 350);
+                popupWindow.setFocusable(true);
+                popupWindow.setOutsideTouchable(true);
+                popupWindow.update();
+                popupWindow.showAsDropDown(settings_icon, -40, 5);
             }
         });
         preferences = getSharedPreferences("user", MODE_APPEND);
@@ -122,5 +163,11 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }, 2000);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        NFLSUtil.isOnline = NFLSUtil.isNetworkAvailable(HomeActivity.this);
     }
 }
