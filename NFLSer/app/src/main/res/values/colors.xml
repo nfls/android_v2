@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#64b169</color>
     <color name="colorPrimaryDark">#1e6e46</color>
-    <drawable name="colorAccentVeryLight">#c8c8c8</drawable>
+    <color name="colorAccentVeryLight">#c8c8c8</color>
     <color name="colorAccentLight">#464646</color>
     <color name="colorAccent">#313335</color>
     <color name="colorAccentDark">#2b2b2b</color>

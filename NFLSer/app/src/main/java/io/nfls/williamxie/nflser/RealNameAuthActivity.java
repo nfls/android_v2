@@ -134,8 +134,8 @@ public class RealNameAuthActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://api.nfls.io/center/realname?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setReadTimeout(5000);
-            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Cookie", " token=" + token);
             connection.setRequestProperty("Content-Type", "application/json");
@@ -206,8 +206,8 @@ public class RealNameAuthActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://api.nfls.io/center/auth?token=" + token);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setReadTimeout(30000);
-            connection.setConnectTimeout(30000);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("GET");
             connection.setDoOutput(true);
             int responseCode = connection.getResponseCode();

@@ -183,8 +183,8 @@ public class PhoneAuthActivity extends AppCompatActivity {
             URL url = new URL("https://api.nfls.io/center/phone");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Cookie", "token=" + getSharedPreferences("user", MODE_APPEND).getString("token", "No Token"));

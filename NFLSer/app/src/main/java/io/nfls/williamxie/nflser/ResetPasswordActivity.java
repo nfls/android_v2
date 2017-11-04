@@ -13,9 +13,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -28,7 +28,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private TextView loginButton = null;
     private Button resetPasswordButton = null;
 
-    private String username = null;
     private String email = null;
 
     private Handler resetPasswordHandler = new Handler() {
@@ -129,18 +128,21 @@ public class ResetPasswordActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://api.nfls.io/center/recover?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("POST");
 
-            String data = "email=" + email + "&session=app";
+            //String data = "email=" + email + "&session=app";
 
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            connection.setRequestProperty("Content-Length", data.length()+"");
+            JSONObject data = new JSONObject();
+            data.put("email", email);
+            data.put("session", "app");
+
+            connection.setRequestProperty("Content-Type", "application/json");
 
             connection.setDoOutput(true);
-            OutputStream outputStream = connection.getOutputStream();
-            outputStream.write(data.getBytes());
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            out.writeBytes(data.toString());
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpsURLConnection.HTTP_OK) {
@@ -152,6 +154,8 @@ public class ResetPasswordActivity extends AppCompatActivity {
         } catch (ProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return json;

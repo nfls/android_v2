@@ -1,6 +1,7 @@
 
 package io.nfls.williamxie.nflser;
 
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -184,7 +185,7 @@ public class ResourcesActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     alertDialog.dismiss();
-                                    File localFile = new File(NFLSUtil.FILE_PATH_DOWNLOAD + file.getHref());
+                                    File localFile = new File(NFLSUtil.FILE_PATH_DOWNLOAD_RESOURCES + file.getHref());
                                     localFile.delete();
                                     file.setDownloaded(false);
                                     if (!NFLSUtil.isOnline) {
@@ -257,7 +258,7 @@ public class ResourcesActivity extends AppCompatActivity {
 
     private void goToDirectory(String directoryPath) {
         try {
-            currentDirectoryText.setText(URLDecoder.decode(currentDirectoryPath, "utf-8"));
+            currentDirectoryText.setText(URLDecoder.decode(currentDirectoryPath.substring(0), "utf-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -266,7 +267,7 @@ public class ResourcesActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.offline_mode, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        alertDialog.dismiss();
+                        dialogInterface.dismiss();
                         NFLSUtil.isOnline = false;
                         thread.interrupt();
                         goToLocalDirectory(currentDirectoryPath);
@@ -281,12 +282,12 @@ public class ResourcesActivity extends AppCompatActivity {
 
     private void goToLocalDirectory(String directoryPath) {
         try {
-            currentDirectoryText.setText(URLDecoder.decode(currentDirectoryPath, "utf-8"));
+            currentDirectoryText.setText(URLDecoder.decode(currentDirectoryPath.replace("/resources_center/", "/"), "utf-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }
         LinkedList<ResourceFile> mData = new LinkedList<ResourceFile>();
-        File dir = new File(NFLSUtil.FILE_PATH_DOWNLOAD + directoryPath);
+        File dir = new File(NFLSUtil.FILE_PATH_DOWNLOAD_RESOURCES + directoryPath);
         File[] files = dir.listFiles();
         if (files != null) {
             for (int i = 0; i < files.length; i ++) {
@@ -296,7 +297,7 @@ public class ResourcesActivity extends AppCompatActivity {
                 try {
                     name = java.net.URLDecoder.decode(file.getName(), "utf-8");
                     path = file.getCanonicalPath();
-                    path = path.substring(path.lastIndexOf("/download/") + 9);
+                    path = path.substring(path.lastIndexOf("/download/resources_center/") + 26);
                     Log.d("DirPath", directoryPath);
                     Log.d("DirPathComplete", dir.getCanonicalPath());
                 } catch (IOException e) {
@@ -360,7 +361,7 @@ public class ResourcesActivity extends AppCompatActivity {
                 if(currentDirectoryPath.equals(href) || !href.contains(currentDirectoryPath)) continue;
 
                 boolean isDownloaded = false;
-                String path = NFLSUtil.FILE_PATH_DOWNLOAD + href;
+                String path = NFLSUtil.FILE_PATH_DOWNLOAD_RESOURCES + href;
                 File file = new File(path);
                 if (file.exists()) {
                     isDownloaded = true;
@@ -389,8 +390,8 @@ public class ResourcesActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://dl.nfls.io/?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(30000);
-            connection.setReadTimeout(30000);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Cookie", " token=" + token);
             connection.setDoOutput(true);
@@ -427,8 +428,8 @@ public class ResourcesActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://dl.nfls.io" + targetFile.getHref());
             connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(30000);
-            connection.setReadTimeout(30000);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Cookie", " token=" + token);
             Log.d("URL", url.toString());
@@ -454,7 +455,7 @@ public class ResourcesActivity extends AppCompatActivity {
                     }
                 }
                 bos.close();
-                String path = NFLSUtil.FILE_PATH_DOWNLOAD;
+                String path = NFLSUtil.FILE_PATH_DOWNLOAD_RESOURCES;
                 String href = targetFile.getHref();
                 File dir = new File(path + href.substring(0, href.lastIndexOf("/")));
                 if (!dir.exists()) {
@@ -493,23 +494,30 @@ public class ResourcesActivity extends AppCompatActivity {
     private void viewFile(String href) {
         if (href.endsWith(".pdf")) {
             Intent intent = new Intent(ResourcesActivity.this, PdfViewerActivity.class);
-            intent.putExtra("filePath", NFLSUtil.FILE_PATH_DOWNLOAD + href);
-            startActivity(intent);
-        } else if (href.endsWith(".mp4")) {
-            Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
-            Uri data = Uri.parse(NFLSUtil.FILE_PATH_DOWNLOAD + href);
-            intent.setDataAndType(data, "video/mp4");
+            intent.putExtra("filePath", NFLSUtil.FILE_PATH_DOWNLOAD_RESOURCES + href);
             startActivity(intent);
         } else if (href.endsWith(".jpg") || href.endsWith(".JPG") || href.endsWith(".png") || href.endsWith(".PNG")) {
             Intent intent = new Intent(ResourcesActivity.this, ImageViewerActivity.class);
-            intent.putExtra("filePath", NFLSUtil.FILE_PATH_DOWNLOAD + href);
+            intent.putExtra("filePath", NFLSUtil.FILE_PATH_DOWNLOAD_RESOURCES + href);
             startActivity(intent);
         } else {
             String suffix = "";
-            if (href.contains(".")) {
-                suffix = href.substring(href.lastIndexOf("."));
+            try {
+                if (href.contains(".")) {
+                    suffix = href.substring(href.lastIndexOf("."));
+                    Log.d("suffix", suffix);
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
+                    Uri data = Uri.parse(NFLSUtil.FILE_PATH_DOWNLOAD_RESOURCES + href);
+                    Log.d("MIMEType", NFLSUtil.getMIMEType(suffix));
+                    intent.setDataAndType(data, NFLSUtil.getMIMEType(suffix));
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(ResourcesActivity.this, getString(R.string.unsupported_tip) + " \"" + suffix + "\"", Toast.LENGTH_SHORT).show();
+                }
+            } catch (ActivityNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(ResourcesActivity.this, getString(R.string.unsupported_tip) + " \"" + suffix + "\"", Toast.LENGTH_SHORT).show();
             }
-            Toast.makeText(ResourcesActivity.this, getString(R.string.unsupported_tip) + " \"" + suffix + "\"", Toast.LENGTH_SHORT).show();
         }
     }
 

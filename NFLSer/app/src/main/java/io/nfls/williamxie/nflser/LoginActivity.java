@@ -129,6 +129,7 @@ public class LoginActivity extends AppCompatActivity {
                                 .setPositiveButton(R.string.go, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
                                         startActivity(new Intent(LoginActivity.this, PhoneAuthActivity.class));
                                     }
                                 })
@@ -142,6 +143,7 @@ public class LoginActivity extends AppCompatActivity {
                                 .setPositiveButton(R.string.go, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
                                         startActivity(new Intent(LoginActivity.this, RealNameAuthActivity.class));
                                     }
                                 })
@@ -163,10 +165,6 @@ public class LoginActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             progressBar.setVisibility(View.INVISIBLE);
-            loginButton.setEnabled(true);
-            signUpButton.setEnabled(true);
-            resetPasswordButton.setEnabled(true);
-            offlineModeButton.setEnabled(true);
             String response = msg.getData().getString("response");
             //Log.d("response", response);
             if (response.equals(NFLSUtil.REQUEST_FAILED)) {
@@ -176,7 +174,7 @@ public class LoginActivity extends AppCompatActivity {
                     JSONObject json = new JSONObject(response);
                     if (json.getInt("code") != HttpsURLConnection.HTTP_OK) {
                         final String url = json.getString("info");
-                        AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this)
+                        new AlertDialog.Builder(LoginActivity.this)
                                 .setTitle(R.string.warning)
                                 .setIcon(R.mipmap.nflsio)
                                 .setMessage(R.string.version_too_old_tip)
@@ -184,6 +182,7 @@ public class LoginActivity extends AppCompatActivity {
                                 .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
                                         Intent intent = new Intent();
                                         intent.setAction("android.intent.action.VIEW");
                                         Uri content_url = Uri.parse(url);
@@ -193,8 +192,25 @@ public class LoginActivity extends AppCompatActivity {
                                 })
                                 .show();
                     } else {
-                        progressBar.setVisibility(View.VISIBLE);
-                        new Thread(autoLoginTask).start();
+                        if (getString(R.string.version_no).contains("-debug")) {
+                            new AlertDialog.Builder(LoginActivity.this)
+                                    .setTitle(R.string.warning)
+                                    .setIcon(R.mipmap.nflsio)
+                                    .setMessage(R.string.version_is_debug_tip)
+                                    .setCancelable(false)
+                                    .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                            progressBar.setVisibility(View.VISIBLE);
+                                            new Thread(autoLoginTask).start();
+                                        }
+                                    })
+                                    .show();
+                        } else {
+                            progressBar.setVisibility(View.VISIBLE);
+                            new Thread(autoLoginTask).start();
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -338,8 +354,8 @@ public class LoginActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://api.nfls.io/center/login?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
 
@@ -380,8 +396,8 @@ public class LoginActivity extends AppCompatActivity {
         try {
             url = new URL("https://api.nfls.io/device/status?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Cookie", " token=" + token);
             connection.setRequestProperty("User-Agent", "Nflsers-Android");
@@ -417,8 +433,8 @@ public class LoginActivity extends AppCompatActivity {
         try {
             url = new URL("https://api.nfls.io/center/username?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Cookie", " token=" + token);
 
@@ -448,8 +464,8 @@ public class LoginActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://api.nfls.io/center/auth?token=" + token);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("GET");
 
             int responseCode = connection.getResponseCode();
@@ -475,14 +491,15 @@ public class LoginActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://api.nfls.io/device/android");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             //connection.setRequestProperty("Cookie", getSharedPreferences("user", MODE_APPEND).getString("token", "No Token"));
 
             JSONObject data = new JSONObject();
-            data.put("version", getString(R.string.version_no));
+            String version_no = getString(R.string.version_no);
+            data.put("version", version_no.substring(0, version_no.lastIndexOf("-debug")));
 
             connection.setDoOutput(true);
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());

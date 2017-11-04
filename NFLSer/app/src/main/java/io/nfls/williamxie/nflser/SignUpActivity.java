@@ -84,7 +84,7 @@ public class SignUpActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = preferences.edit();
                         editor.putString("token", json.getString("token"));
                         editor.putString("username", username);
-                        editor.commit();
+                        editor.apply();
                         Toast.makeText(SignUpActivity.this, SignUpActivity.this.getString(R.string.welcome) + " " + username + " !", Toast.LENGTH_LONG).show();
                         startActivity(new Intent(SignUpActivity.this, HomeActivity.class));
                     } else {
@@ -182,8 +182,8 @@ public class SignUpActivity extends AppCompatActivity {
         try {
             URL url = new URL("https://api.nfls.io/center/register?");
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(30000);
-            connection.setReadTimeout(30000);
+            connection.setConnectTimeout(NFLSUtil.TIME_OUT);
+            connection.setReadTimeout(NFLSUtil.TIME_OUT);
             connection.setRequestMethod("POST");
 
             //String data = "username=" + username + "&password=" + password + "&email=" + email + "&session=app";

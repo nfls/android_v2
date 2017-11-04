@@ -77,4 +77,8 @@
     <string name="developer_name">嘿侍</string>
     <string name="version">版本</string>
     <string name="say_thanks_to">多谢</string>
+    <string name="version_is_debug_tip">该应用版本为调试版本, 请按需更新最新发行版本应用</string>
+    <string name="offline_tip">请打开WIFI或者蜂窝移动数据以使用该功能</string>
+    <string name="tickets">门票</string>
+    <string name="analyzing">解析中 ...</string>
 </resources>

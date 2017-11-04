@@ -27,7 +27,7 @@ public class HomeActivity extends AppCompatActivity {
     private boolean mIsExit;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         list_function_block = (ListView) findViewById(R.id.list_function_block);
@@ -107,6 +107,7 @@ public class HomeActivity extends AppCompatActivity {
                 options.add(getString(R.string.settings));
                 options.add(getString(R.string.about));
                 options.add(getString(R.string.log_out));
+                options.add(getString(R.string.tickets));
                 View popupView = HomeActivity.this.getLayoutInflater().inflate(R.layout.window_popup_settings, null);
                 ListView listView = (ListView) popupView.findViewById(R.id.list_view_popup);
                 listView.setAdapter(new ArrayAdapter<String>(HomeActivity.this, R.layout.item_list_settings, options));
@@ -114,7 +115,10 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         switch (i) {
-                            case 0: break;
+                            case 0: {
+                                Toast.makeText(HomeActivity.this,R.string.close_tip, Toast.LENGTH_SHORT).show();
+                                break;
+                            }
                             case 1: {
                                 new AlertDialog.Builder(HomeActivity.this)
                                         .setIcon(R.mipmap.nflsio)
@@ -131,10 +135,20 @@ public class HomeActivity extends AppCompatActivity {
                                 startActivity(new Intent(HomeActivity.this, LoginActivity.class));
                                 break;
                             }
+                            case 3: {
+                                Intent intent = new Intent(HomeActivity.this, PassKitActivity.class);
+                                intent.putExtra("url", "https://api.nfls.io/ic/ticket");
+                                startActivity(intent);
+                                break;
+                            }
+                            default: {
+                                Toast.makeText(HomeActivity.this,"你tm点了什么弹出这个窗口", Toast.LENGTH_SHORT).show();
+                                break;
+                            }
                         }
                     }
                 });
-                PopupWindow popupWindow = new PopupWindow(popupView, 200, 350);
+                PopupWindow popupWindow = new PopupWindow(popupView, 200, 450);
                 popupWindow.setFocusable(true);
                 popupWindow.setOutsideTouchable(true);
                 popupWindow.update();
