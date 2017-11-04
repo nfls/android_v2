@@ -84,4 +84,5 @@
     <string name="offline_tip">Please open WIFI or 4G to use this function.</string>
     <string name="tickets">Tickets</string>
     <string name="analyzing">Analyzing ...</string>
+    <string name="ticket_request_failed_tip">Maybe you haven\'t buy the digital ticket</string>
 </resources>

@@ -81,4 +81,5 @@
     <string name="offline_tip">请打开WIFI或者蜂窝移动数据以使用该功能</string>
     <string name="tickets">门票</string>
     <string name="analyzing">解析中 ...</string>
+    <string name="ticket_request_failed_tip">也许你没有购买电子票</string>
 </resources>

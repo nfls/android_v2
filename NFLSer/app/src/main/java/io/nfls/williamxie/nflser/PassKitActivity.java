@@ -77,7 +77,7 @@ public class PassKitActivity extends AppCompatActivity {
             Bundle data = msg.getData();
             String response = data.getString("response");
             if (response.equals(NFLSUtil.REQUEST_FAILED)) {
-                Toast.makeText(PassKitActivity.this, R.string.request_failed, Toast.LENGTH_LONG).show();
+                Toast.makeText(PassKitActivity.this, getString(R.string.request_failed) + "\n" + getString(R.string.ticket_request_failed_tip), Toast.LENGTH_LONG).show();
                 finish();
             } else {
                 refreshViews();
@@ -145,6 +145,8 @@ public class PassKitActivity extends AppCompatActivity {
         });
 
         back.setVisibility(GONE);
+
+        NFLSUtil.verifyStoragePermissions(PassKitActivity.this);
     }
 
     @Override

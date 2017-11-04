@@ -499,7 +499,12 @@ public class LoginActivity extends AppCompatActivity {
 
             JSONObject data = new JSONObject();
             String version_no = getString(R.string.version_no);
-            data.put("version", version_no.substring(0, version_no.lastIndexOf("-debug")));
+
+            if (version_no.contains("-debug")) {
+                data.put("version", version_no.substring(0, version_no.lastIndexOf("-debug")));
+            } else {
+                data.put("version", version_no);
+            }
 
             connection.setDoOutput(true);
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
