@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
@@ -54,6 +55,7 @@ public class HomeActivity extends AppCompatActivity {
                 swipeRefreshLayout.setRefreshing(false);
             } else {
                 try {
+                    mNewsData.clear();
                     JSONArray jsons = new JSONObject(response).getJSONArray("info");
                     for (int i = 0; i < jsons.length(); i ++) {
                         JSONObject json = jsons.getJSONObject(i);
@@ -64,8 +66,14 @@ public class HomeActivity extends AppCompatActivity {
                         String conf = json.getString("conf");
                         String imageUrl = json.getString("img");
                         News news = new News(time, title, type, detail, conf, imageUrl);
-                        mNewsDataBuffer.add(news);
-                        new Thread(new getNewsImageTask(mNewsDataBuffer.get(i).getImageUrl(), i)).start();
+                        mNewsData.add(news);
+                    }
+
+                    mNewsAdapter.notifyDataSetChanged();
+                    swipeRefreshLayout.setRefreshing(false);
+
+                    for (int i = 0; i < mNewsData.size(); i ++) {
+                        new Thread(new getNewsImageTask(mNewsData.get(i).getImageUrl(), i)).start();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -76,24 +84,23 @@ public class HomeActivity extends AppCompatActivity {
 
     private Handler getNewsImageHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg) {
+        public synchronized void handleMessage(Message msg) {
             Bundle data = msg.getData();
-            News news = mNewsDataBuffer.get(data.getInt("index"));
-            Bitmap image = (Bitmap) data.getParcelable("image");
+            News news = mNewsData.get(data.getInt("index"));
+            Bitmap image = data.getParcelable("image");
             if (image == null) {
                 image = BitmapFactory.decodeResource(getResources(), R.mipmap.help_icon);
             }
             news.setImage(image);
-            for (News n : mNewsDataBuffer) {
+            /*
+            for (News n : mNewsData) {
                 if (n.getImage() == null) {
+                    Log.d("Null", "Return");
                     return;
                 }
             }
-            mNewsData.clear();
-            mNewsData.addAll(mNewsDataBuffer);
-            mNewsDataBuffer.clear();
+            */
             mNewsAdapter.notifyDataSetChanged();
-            swipeRefreshLayout.setRefreshing(false);
         }
     };
 
@@ -222,6 +229,8 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
         swipeRefreshLayout.setColorSchemeColors(Color.BLACK, Color.DKGRAY, Color.GRAY, Color.LTGRAY, Color.GREEN);
+        swipeRefreshLayout.setDistanceToTriggerSync(200);
+        swipeRefreshLayout.setProgressViewOffset(true, 50, 250);
 
         if (NFLSUtil.isInternetRequestAvailable(HomeActivity.this)) {
             refreshNews();
@@ -286,6 +295,7 @@ public class HomeActivity extends AppCompatActivity {
                 PopupWindow popupWindow = new PopupWindow(popupView, 200, options.size() * 110);
                 popupWindow.setFocusable(true);
                 popupWindow.setOutsideTouchable(true);
+                popupWindow.setBackgroundDrawable(new BitmapDrawable(getResources(), BitmapFactory.decodeResource(getResources(), R.drawable.background_list_settings_popup)));
                 popupWindow.update();
                 popupWindow.showAsDropDown(settings_icon, -40, 5);
             }

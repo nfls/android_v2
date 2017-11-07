@@ -52,7 +52,9 @@ public class NewsAdapter extends BaseAdapter {
         } else {
             holder = (NewsAdapter.ViewHolder) convertView.getTag();
         }
-        holder.img.setImageBitmap(news.getImage());
+        if (news.getImage() != null) {
+            holder.img.setImageBitmap(news.getImage());
+        }
         holder.title.setText(news.getTitle());
         String info = news.getType() + " " + news.getTime();
         holder.info.setText(info);
