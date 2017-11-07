@@ -52,7 +52,7 @@
                     android:id="@+id/settings_icon"
                     android:layout_width="43dp"
                     android:layout_height="43dp"
-                    android:layout_marginRight="15dp"
+                    android:layout_marginEnd="15dp"
                     android:background="@null"
                     android:src="@drawable/selector_settings_icon"
                     android:tint="@drawable/selector_tool_icon_tint"
@@ -73,6 +73,28 @@
             android:textColor="@color/colorAccentLight"
             android:textStyle="normal"
             android:textSize="20sp"/>
+
+        <View
+            android:id="@+id/blank_view"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:visibility="gone"/>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="10dp">
+
+            <ListView
+                android:id="@+id/list_news"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:choiceMode="singleChoice"
+                android:duplicateParentState="true"/>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
     </LinearLayout>
 
@@ -100,7 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="2"
-            android:layout_gravity="left"
+            android:layout_gravity="start"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:background="@color/colorPrimary"

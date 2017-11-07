@@ -171,7 +171,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.INVISIBLE);
 
-        if (!NFLSUtil.isNetworkAvailable(SignUpActivity.this)) {
+        if (!NFLSUtil.isInternetRequestAvailable(SignUpActivity.this)) {
             Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
             startActivity(intent);
         }
@@ -192,8 +192,8 @@ public class SignUpActivity extends AppCompatActivity {
             connection.setRequestProperty("Content-Type", "application/json");
 
             JSONObject data = new JSONObject();
-            data.put("username", java.net.URLEncoder.encode(username, "utf-8"));
-            data.put("password", java.net.URLEncoder.encode(password, "utf-8"));
+            data.put("username", username);
+            data.put("password", password);
             data.put("email", email);
             data.put("session", "app");
 

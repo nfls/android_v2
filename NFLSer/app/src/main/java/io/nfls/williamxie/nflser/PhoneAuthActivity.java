@@ -131,6 +131,7 @@ public class PhoneAuthActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
+                startActivity(new Intent(PhoneAuthActivity.this, HomeActivity.class));
             }
         });
         progressBar.setVisibility(View.INVISIBLE);

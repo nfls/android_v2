@@ -1,12 +1,14 @@
 package io.nfls.williamxie.nflser;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
@@ -15,6 +17,7 @@ import android.support.v4.app.ActivityCompat;
 
 import java.io.*;
 
+import android.widget.Toast;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
@@ -22,12 +25,16 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 public class NFLSUtil {
     public static boolean isOnline = false;
+    public static boolean isOfflineMode = false;
     public static final String TOKEN_CORRECT = "token_correct";
     public static final String TOKEN_WRONG = "token_wrong";
     public static final String REQUEST_FAILED = "request_failed";
     public static final String FILE_PATH_DOWNLOAD_RESOURCES = Environment.getExternalStorageDirectory() + "/download/resources_center";
     public static final String FILE_PATH_DOWNLOAD_PASSKITS = Environment.getExternalStorageDirectory() + "/download/passkits";
-    public static int TIME_OUT = 30000;
+    public static final int TIME_OUT = 30000;
+    public static final long DEFAULT_VIBRATING_TIME = 2000;
+    public static final long VIBRATING_TIME_SHORT = 1000;
+    public static final long VIBRATING_TIME_LONG = 3000;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {"android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"};
     private static final String[][] MIME_MapTable = {
@@ -100,7 +107,19 @@ public class NFLSUtil {
             {"", "*/*"}
     };
 
-public static void verifyStoragePermissions(Activity activity) {
+    public static boolean isInternetRequestAvailable(Activity activity) {
+        if (isOfflineMode) {
+            return false;
+        } else {
+            isOnline = isNetworkAvailable(activity);
+            if (isOnline) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    public static void verifyStoragePermissions(Activity activity) {
         try {
             int permission = ActivityCompat.checkSelfPermission(activity,
                     "android.permission.WRITE_EXTERNAL_STORAGE");
@@ -194,5 +213,24 @@ public static void verifyStoragePermissions(Activity activity) {
                 type = MIME_MapTable[i][1];
         }
         return type;
+    }
+    public static void vibrate(final Activity activity) {
+        vibrate(activity, DEFAULT_VIBRATING_TIME);
+    }
+    public static void vibrate(final Activity activity, long milliseconds) {
+        Vibrator vib = (Vibrator) activity.getSystemService(Service.VIBRATOR_SERVICE);
+        vib.vibrate(milliseconds);
+        Toast.makeText(activity, R.string.vibrating, Toast.LENGTH_SHORT).show();
+    }
+    public static void vibrate(final Activity activity, long[] pattern, int repeat){
+        Vibrator vib = (Vibrator) activity.getSystemService(Service.VIBRATOR_SERVICE);
+        vib.vibrate(pattern, repeat);
+        Toast.makeText(activity, R.string.vibrating, Toast.LENGTH_SHORT).show();
+    }
+    public static void vibrateShort(final Activity activity) {
+        vibrate(activity, VIBRATING_TIME_SHORT);
+    }
+    public static void vibrateLong(final Activity activity) {
+        vibrate(activity, VIBRATING_TIME_LONG);
     }
 }

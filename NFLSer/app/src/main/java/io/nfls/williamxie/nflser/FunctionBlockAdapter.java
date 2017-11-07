@@ -9,13 +9,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.LinkedList;
+import java.util.Vector;
 
 public class FunctionBlockAdapter extends BaseAdapter {
 
-    private LinkedList<FunctionBlock> mData;
+    private Vector<FunctionBlock> mData;
     private Context mContext;
 
-    public FunctionBlockAdapter(LinkedList<FunctionBlock> mData, Context mContext) {
+    public FunctionBlockAdapter(Vector<FunctionBlock> mData, Context mContext) {
         this.mData = mData;
         this.mContext = mContext;
     }

@@ -9,14 +9,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.sql.Timestamp;
-import java.util.LinkedList;
+import java.util.Vector;
 
 public class ResourceFileAdapter extends BaseAdapter {
 
-    private LinkedList<ResourceFile> mData;
+    private Vector<ResourceFile> mData;
     private Context mContext;
 
-    public ResourceFileAdapter(LinkedList<ResourceFile> mData, Context mContext) {
+    public ResourceFileAdapter(Vector<ResourceFile> mData, Context mContext) {
         this.mData = mData;
         this.mContext = mContext;
     }

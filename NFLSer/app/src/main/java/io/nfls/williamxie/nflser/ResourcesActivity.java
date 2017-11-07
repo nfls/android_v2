@@ -24,13 +24,14 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.LinkedList;
+import java.util.Vector;
 
 public class ResourcesActivity extends AppCompatActivity {
 
     private String lastDirectoryPath = "";
     private String currentDirectoryPath = "/";
 
-    private LinkedList<ResourceFile> mData;
+    private Vector<ResourceFile> mData;
     private ResourceFileAdapter mAdapter;
     private ListView list_resource_files;
     private TextView currentDirectoryText;
@@ -116,7 +117,7 @@ public class ResourcesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_resources);
 
         list_resource_files = (ListView) findViewById(R.id.list_resource_files);
-        mData = new LinkedList<ResourceFile>();
+        mData = new Vector<ResourceFile>();
         mAdapter = new ResourceFileAdapter(mData, ResourcesActivity.this);
         list_resource_files.setAdapter(mAdapter);
 
@@ -127,9 +128,8 @@ public class ResourcesActivity extends AppCompatActivity {
                 if (file.isFolder()) {
                     lastDirectoryPath = currentDirectoryPath;
                     currentDirectoryPath = file.getHref();
-                    Log.d("isOnline", NFLSUtil.isOnline + "");
                     Log.d("CurDirPathWhenBack", currentDirectoryPath);
-                    if (NFLSUtil.isOnline) {
+                    if (NFLSUtil.isInternetRequestAvailable(ResourcesActivity.this)) {
                         goToDirectory(currentDirectoryPath);
                     } else {
                         goToLocalDirectory(currentDirectoryPath);
@@ -188,7 +188,7 @@ public class ResourcesActivity extends AppCompatActivity {
                                     File localFile = new File(NFLSUtil.FILE_PATH_DOWNLOAD_RESOURCES + file.getHref());
                                     localFile.delete();
                                     file.setDownloaded(false);
-                                    if (!NFLSUtil.isOnline) {
+                                    if (!NFLSUtil.isInternetRequestAvailable(ResourcesActivity.this)) {
                                         mData.remove(file);
                                     }
                                     refreshList();
@@ -217,7 +217,7 @@ public class ResourcesActivity extends AppCompatActivity {
                     if (!lastDirectoryPath.equals("")) {
                         lastDirectoryPath = lastDirectoryPath.substring(0, lastDirectoryPath.lastIndexOf("/") + 1);
                     }
-                    if (NFLSUtil.isOnline) {
+                    if (NFLSUtil.isInternetRequestAvailable(ResourcesActivity.this)) {
                         goToDirectory(currentDirectoryPath);
                     } else {
                         goToLocalDirectory(currentDirectoryPath);
@@ -240,7 +240,7 @@ public class ResourcesActivity extends AppCompatActivity {
 
         NFLSUtil.verifyStoragePermissions(ResourcesActivity.this);
 
-        if (NFLSUtil.isOnline) {
+        if (NFLSUtil.isInternetRequestAvailable(ResourcesActivity.this)) {
             goToDirectory(currentDirectoryPath);
         } else {
             goToLocalDirectory(currentDirectoryPath);
@@ -268,7 +268,7 @@ public class ResourcesActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
-                        NFLSUtil.isOnline = false;
+                        NFLSUtil.isOfflineMode = true;
                         thread.interrupt();
                         goToLocalDirectory(currentDirectoryPath);
                         return;

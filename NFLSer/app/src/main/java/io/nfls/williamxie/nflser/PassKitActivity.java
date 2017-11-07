@@ -5,10 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
@@ -16,11 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
-import jp.wasabeef.blurry.Blurry;
-import jp.wasabeef.blurry.internal.Blur;
-import jp.wasabeef.blurry.internal.BlurFactor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,6 +48,7 @@ public class PassKitActivity extends AppCompatActivity {
     private ImageView logo = null;
     private ImageView thumbnail = null;
     private ImageView barcode = null;
+    private ImageView barcode_back = null;
     private TextView label_1 = null;
     private TextView label_2 = null;
     private TextView label_3 = null;
@@ -103,7 +98,6 @@ public class PassKitActivity extends AppCompatActivity {
 
         try {
             url = new URL(getIntent().getExtras().getString("url"));
-            refresh();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -112,6 +106,7 @@ public class PassKitActivity extends AppCompatActivity {
         logo = (ImageView) findViewById(R.id.logo);
         thumbnail = (ImageView) findViewById(R.id.thumbnail);
         barcode = (ImageView) findViewById(R.id.barcode);
+        barcode_back = (ImageView) findViewById(R.id.barcode_back);
         label_1 = (TextView) findViewById(R.id.label_1);
         label_2 = (TextView) findViewById(R.id.label_2);
         label_3 = (TextView) findViewById(R.id.label_3);
@@ -152,7 +147,7 @@ public class PassKitActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        //refresh();
+        refresh();
     }
 
     @Override
@@ -164,11 +159,11 @@ public class PassKitActivity extends AppCompatActivity {
     }
 
     private void refresh() {
-        NFLSUtil.isOnline = NFLSUtil.isNetworkAvailable(PassKitActivity.this);
-        if (NFLSUtil.isOnline) {
+        if (NFLSUtil.isInternetRequestAvailable(PassKitActivity.this)) {
             alertDialog = new AlertDialog.Builder(PassKitActivity.this)
                     .setIcon(R.mipmap.nflsio)
-                    .setTitle(R.string.downloading)
+                    .setTitle(R.string.download)
+                    .setMessage(R.string.downloading)
                     .setCancelable(false)
                     .show();
             new Thread(downloadPasskitTask).start();
@@ -225,6 +220,7 @@ public class PassKitActivity extends AppCompatActivity {
             logo.setImageBitmap(bitmaps[LOGO]);
             thumbnail.setImageBitmap(bitmaps[THUMBNAIL]);
             barcode.setImageBitmap(NFLSUtil.createBarcode(passContent.getJSONObject("barcode").getString("message"), barcode.getWidth(), barcode.getHeight()));
+            barcode_back.setImageBitmap(NFLSUtil.createBarcode(passContent.getJSONObject("barcode").getString("message"), barcode.getWidth(), barcode.getHeight()));
             String color = passContent.getString("labelColor");
             color = color.substring(color.lastIndexOf("(") + 1, color.lastIndexOf(")"));
             Log.d("LabelColor", color);
@@ -263,11 +259,11 @@ public class PassKitActivity extends AppCompatActivity {
             value_3.setText(passContent.getJSONObject("eventTicket").getJSONArray("auxiliaryFields").getJSONObject(0).getString("value"));
             value_4.setText(passContent.getJSONObject("eventTicket").getJSONArray("auxiliaryFields").getJSONObject(1).getString("value"));
             JSONArray backFields = passContent.getJSONObject("eventTicket").getJSONArray("backFields");
-            text_1.setText(backFields.getJSONObject(0).getString("label") + "\n" + backFields.getJSONObject(0).getString("value") + "\n" + backFields.getJSONObject(0).getString("attributedValue"));
-            text_2.setText(backFields.getJSONObject(1).getString("label") + "\n" + backFields.getJSONObject(1).getString("value") + "\n" + backFields.getJSONObject(1).getString("attributedValue"));
-            text_3.setText(backFields.getJSONObject(2).getString("label") + "\n" + backFields.getJSONObject(2).getString("value") + "\n" + backFields.getJSONObject(2).getString("attributedValue"));
-            text_4.setText(backFields.getJSONObject(3).getString("label") + "\n" + backFields.getJSONObject(3).getString("value") + "\n" + backFields.getJSONObject(3).getString("attributedValue"));
-            text_5.setText(backFields.getJSONObject(4).getString("label") + "\n" + backFields.getJSONObject(4).getString("value") + "\n" + backFields.getJSONObject(4).getString("attributedValue"));
+            text_1.setText(backFields.getJSONObject(0).getString("label") + "\n" + backFields.getJSONObject(0).getString("value"));
+            text_2.setText(backFields.getJSONObject(1).getString("label") + "\n" + backFields.getJSONObject(1).getString("value"));
+            text_3.setText(backFields.getJSONObject(2).getString("label") + "\n" + backFields.getJSONObject(2).getString("value"));
+            text_4.setText(backFields.getJSONObject(3).getString("label") + "\n" + backFields.getJSONObject(3).getString("value"));
+            text_5.setText(backFields.getJSONObject(4).getString("label") + "\n" + backFields.getJSONObject(4).getString("value"));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {

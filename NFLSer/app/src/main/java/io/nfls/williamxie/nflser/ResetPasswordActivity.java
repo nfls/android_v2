@@ -117,7 +117,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.INVISIBLE);
 
-        if (!NFLSUtil.isNetworkAvailable(ResetPasswordActivity.this)) {
+        if (!NFLSUtil.isInternetRequestAvailable(ResetPasswordActivity.this)) {
             Intent intent = new Intent(ResetPasswordActivity.this, HomeActivity.class);
             startActivity(intent);
         }

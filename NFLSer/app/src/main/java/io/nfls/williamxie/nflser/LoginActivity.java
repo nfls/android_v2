@@ -319,12 +319,12 @@ public class LoginActivity extends AppCompatActivity {
         offlineModeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NFLSUtil.isOnline = false;
+                NFLSUtil.isOfflineMode = true;
                 startActivity(new Intent(LoginActivity.this, HomeActivity.class));
             }
         });
 
-        if (!NFLSUtil.isNetworkAvailable(LoginActivity.this)) {
+        if (!NFLSUtil.isInternetRequestAvailable(LoginActivity.this)) {
             Toast.makeText(LoginActivity.this, R.string.offline, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
@@ -362,8 +362,8 @@ public class LoginActivity extends AppCompatActivity {
             //String data = "username=" + java.net.URLEncoder.encode(username, "utf-8") + "&password=" + java.net.URLEncoder.encode(password, "utf-8") + "&session=app";
 
             JSONObject data = new JSONObject();
-            data.put("username", java.net.URLEncoder.encode(username, "utf-8"));
-            data.put("password", java.net.URLEncoder.encode(password, "utf-8"));
+            data.put("username", username);
+            data.put("password", password);
             data.put("session", "app");
 
             connection.setDoOutput(true);

@@ -82,4 +82,7 @@
     <string name="tickets">门票</string>
     <string name="analyzing">解析中 ...</string>
     <string name="ticket_request_failed_tip">也许你没有购买电子票</string>
+    <string name="vibrate">震动</string>
+    <string name="vibrating">震动中 ...</string>
+    <string name="vibrator">震动器</string>
 </resources>

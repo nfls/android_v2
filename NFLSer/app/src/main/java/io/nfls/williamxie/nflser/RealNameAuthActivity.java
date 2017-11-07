@@ -121,6 +121,7 @@ public class RealNameAuthActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
+                startActivity(new Intent(RealNameAuthActivity.this, HomeActivity.class));
             }
         });
 
@@ -141,9 +142,9 @@ public class RealNameAuthActivity extends AppCompatActivity {
             connection.setRequestProperty("Content-Type", "application/json");
 
             JSONObject data = new JSONObject();
-            data.put("chnName", java.net.URLEncoder.encode(chinese_name, "utf-8"));
-            data.put("engName", java.net.URLEncoder.encode(english_name, "utf-8"));
-            data.put("tmpClass", java.net.URLEncoder.encode(classID, "utf-8"));
+            data.put("chnName", chinese_name);
+            data.put("engName", english_name);
+            data.put("tmpClass", classID);
 
             Log.d("Data", data.toString());
 

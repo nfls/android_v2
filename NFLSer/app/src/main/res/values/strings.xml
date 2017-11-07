@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">NFLSer</string>
-    <string name="version_no" translatable="false">0.0.8</string>
+    <string name="version_no" translatable="false">0.1.0-debug</string>
 
     <string name="version">Version</string>
     <string name="developer">Developer</string>
@@ -85,4 +85,7 @@
     <string name="tickets">Tickets</string>
     <string name="analyzing">Analyzing ...</string>
     <string name="ticket_request_failed_tip">Maybe you haven\'t buy the digital ticket</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="vibrator">Vibrator</string>
+    <string name="vibrating">Vibrating ...</string>
 </resources>
