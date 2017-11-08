@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">NFLSer</string>
-    <string name="version_no" translatable="false">0.1.0</string>
+    <string name="version_no" translatable="false">0.1.1</string>
 
     <string name="version">Version</string>
     <string name="developer">Developer</string>
@@ -74,6 +74,7 @@
     <string name="go">Go</string>
     <string name="resources_closed_tip">Please complete Real Name Auth first !</string>
     <string name="verison_check">Version Check</string>
+    <string name="version_old_tip">The app version is not the latest. Update it to enjoy the new functions and bugs-fixings.</string>
     <string name="version_too_old_tip">The app version is too old to be supported, please update.</string>
     <string name="version_is_debug_tip">The app version is for debugging only, install release version in the future.</string>
     <string name="update">Update</string>

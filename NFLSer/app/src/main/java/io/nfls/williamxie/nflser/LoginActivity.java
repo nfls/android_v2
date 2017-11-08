@@ -172,7 +172,7 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 try {
                     JSONObject json = new JSONObject(response);
-                    if (json.getInt("code") != HttpsURLConnection.HTTP_OK) {
+                    if (json.getInt("code") == HttpsURLConnection.HTTP_ACCEPTED) {
                         final String url = json.getString("info");
                         new AlertDialog.Builder(LoginActivity.this)
                                 .setTitle(R.string.warning)
@@ -188,6 +188,33 @@ public class LoginActivity extends AppCompatActivity {
                                         Uri content_url = Uri.parse(url);
                                         intent.setData(content_url);
                                         startActivity(intent);
+                                    }
+                                })
+                                .show();
+                    } else if (json.getInt("code") == HttpsURLConnection.HTTP_CREATED) {
+                        final String url = json.getString("info");
+                        new AlertDialog.Builder(LoginActivity.this)
+                                .setTitle(R.string.warning)
+                                .setIcon(R.mipmap.nflsio)
+                                .setMessage(R.string.version_old_tip)
+                                .setCancelable(false)
+                                .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                        Uri content_url = Uri.parse(url);
+                                        Intent intent = new Intent();
+                                        intent.setAction("android.intent.action.VIEW");
+                                        intent.setData(content_url);
+                                        startActivity(intent);
+                                    }
+                                })
+                                .setNegativeButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                        progressBar.setVisibility(View.VISIBLE);
+                                        new Thread(autoLoginTask).start();
                                     }
                                 })
                                 .show();

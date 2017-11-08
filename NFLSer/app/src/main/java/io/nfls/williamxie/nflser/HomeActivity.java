@@ -1,5 +1,6 @@
 package io.nfls.williamxie.nflser;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -166,28 +167,8 @@ public class HomeActivity extends AppCompatActivity {
                 }
                 FunctionBlock block = mFunctionBlockData.get(i - 1);
                 if (i == 1) {
-                    Log.d("Choice", preferences.getBoolean("hasRealNameAuth", false) + "");
-                    if (NFLSUtil.isOnline) {
-                        if (!preferences.getBoolean("hasRealNameAuth", false)) {
-                            Toast.makeText(HomeActivity.this, R.string.resources_closed_tip, Toast.LENGTH_SHORT).show();
-                            new AlertDialog.Builder(HomeActivity.this)
-                                    .setTitle(R.string.warning)
-                                    .setIcon(R.mipmap.nflsio)
-                                    .setMessage(R.string.real_name_auth_tip)
-                                    .setCancelable(false)
-                                    .setPositiveButton(R.string.go, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            if (preferences.getBoolean("hasPhoneAuth", false)) {
-                                                startActivity(new Intent(HomeActivity.this, RealNameAuthActivity.class));
-                                            } else {
-                                                startActivity(new Intent(HomeActivity.this, PhoneAuthActivity.class));
-                                            }
-                                        }
-                                    })
-                                    .show();
-                        } else {
-                            //Toast.makeText(HomeActivity.this, block.getName(), Toast.LENGTH_SHORT).show();
+                    if (NFLSUtil.isInternetRequestAvailable(HomeActivity.this)) {
+                        if (realNameAuthCheck(HomeActivity.this)) {
                             startActivity(new Intent(HomeActivity.this, ResourcesActivity.class));
                         }
                     } else {
@@ -276,9 +257,11 @@ public class HomeActivity extends AppCompatActivity {
                                 break;
                             }
                             case 3: {
-                                Intent intent = new Intent(HomeActivity.this, PassKitActivity.class);
-                                intent.putExtra("url", "https://api.nfls.io/ic/ticket");
-                                startActivity(intent);
+                                if (realNameAuthCheck(HomeActivity.this)) {
+                                    Intent intent = new Intent(HomeActivity.this, PassKitActivity.class);
+                                    intent.putExtra("url", "https://api.nfls.io/ic/ticket");
+                                    startActivity(intent);
+                                }
                                 break;
                             }
                             case 4: {
@@ -358,6 +341,32 @@ public class HomeActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return image;
+    }
+
+    public static boolean realNameAuthCheck(final Activity activity) {
+        final SharedPreferences preferences = activity.getSharedPreferences("user", MODE_APPEND);
+        if (!preferences.getBoolean("hasRealNameAuth", false)) {
+            Toast.makeText(activity, R.string.resources_closed_tip, Toast.LENGTH_SHORT).show();
+            new AlertDialog.Builder(activity)
+                    .setTitle(R.string.warning)
+                    .setIcon(R.mipmap.nflsio)
+                    .setMessage(R.string.real_name_auth_tip)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.go, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (preferences.getBoolean("hasPhoneAuth", false)) {
+                                activity.startActivity(new Intent(activity, RealNameAuthActivity.class));
+                            } else {
+                                activity.startActivity(new Intent(activity, PhoneAuthActivity.class));
+                            }
+                        }
+                    })
+                    .show();
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
