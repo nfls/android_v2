@@ -47,6 +47,7 @@ public class SignUpActivity extends AppCompatActivity {
                     JSONObject json = new JSONObject(jsonString).getJSONObject("info");
                     if (json.getString("status").equals("success")) {
                         new Thread(loginTask).start();
+                        //startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                     } else {
                         Toast.makeText(SignUpActivity.this, json.getString("message"), Toast.LENGTH_SHORT).show();
                     }

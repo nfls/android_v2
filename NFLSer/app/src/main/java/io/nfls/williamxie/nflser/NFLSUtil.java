@@ -1,14 +1,13 @@
 package io.nfls.williamxie.nflser;
 
 import android.app.Activity;
-import android.app.Service;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
-import android.os.Vibrator;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
@@ -16,8 +15,8 @@ import android.renderscript.ScriptIntrinsicBlur;
 import android.support.v4.app.ActivityCompat;
 
 import java.io.*;
+import java.util.Calendar;
 
-import android.widget.Toast;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
@@ -31,6 +30,7 @@ public class NFLSUtil {
     public static final String REQUEST_FAILED = "request_failed";
     public static final String FILE_PATH_DOWNLOAD_RESOURCES = Environment.getExternalStorageDirectory() + "/download/resources_center";
     public static final String FILE_PATH_DOWNLOAD_PASSKITS = Environment.getExternalStorageDirectory() + "/download/passkits";
+    public static final String FILE_PATH_DOWNLOAD_LAUNCH_IMAGES = Environment.getExternalStorageDirectory() + "/download/launch_images";
     public static final int TIME_OUT = 30000;
     public static final long DEFAULT_VIBRATING_TIME = 2000;
     public static final long VIBRATING_TIME_SHORT = 1000;
@@ -73,8 +73,8 @@ public class NFLSUtil {
             {".m4v", "video/x-m4v"},
             {".mov", "video/quicktime"},
             {".mp2", "audio/x-mpeg"},
-            //{".mp3", "audio/x-mpeg"},
-            {".mp3", "video/mp3"},
+            {".mp3", "audio/x-mpeg"},
+            //{".mp3", "video/mp3"},
             {".mp4", "video/mp4"},
             {".mpc", "application/vnd.mpohun.certificate"},
             {".mpe", "video/mpeg"},
@@ -214,6 +214,56 @@ public class NFLSUtil {
         }
         return type;
     }
+    public static String stringToUnicode(String string) {
+        StringBuffer unicode = new StringBuffer();
+        for (int i = 0; i < string.length(); i ++) {
+            char c = string.charAt(i);
+            unicode.append("\\u" + Integer.toHexString(c));
+        }
+        return unicode.toString();
+    }
+    public static boolean isOnDate(int y, int m, int d) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        return year == y && month == m && day == d;
+    }
+    public static boolean isAfterDate(int y, int m, int d, boolean includeDate) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        if (year > y) {
+            return true;
+        } else if (year < y) {
+            return false;
+        } else {
+            if (month > m) {
+                return true;
+            } else if (month < m) {
+                return false;
+            } else {
+                if (includeDate) {
+                    return day >= d;
+                } else {
+                    return day > d;
+                }
+            }
+        }
+    }
+    public static boolean isApplicationInstalled(String packageName, Activity activity) {
+        if (packageName == null || "".equals(packageName)){
+            return false;
+        }
+        try {
+            ApplicationInfo info = activity.getPackageManager().getApplicationInfo(packageName, PackageManager.GET_UNINSTALLED_PACKAGES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+    /*
     public static void vibrate(final Activity activity) {
         vibrate(activity, DEFAULT_VIBRATING_TIME);
     }
@@ -233,4 +283,5 @@ public class NFLSUtil {
     public static void vibrateLong(final Activity activity) {
         vibrate(activity, VIBRATING_TIME_LONG);
     }
+    */
 }

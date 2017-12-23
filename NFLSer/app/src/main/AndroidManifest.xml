@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="io.nfls.williamxie.nflser">
 
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="26"/>
+
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -17,8 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginActivity"
-            android:launchMode="singleTask">
+            android:name=".LaunchActivity"
+            android:launchMode="standard">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -42,6 +44,14 @@
         <activity android:name=".PhoneAuthActivity">
         </activity>
         <activity android:name=".PassKitActivity">
+        </activity>
+        <activity android:name=".VibratorActivity">
+        </activity>
+        <activity android:name=".OpenFaceActivity">
+        </activity>
+        <activity android:name=".SecretSantaActivity">
+        </activity>
+        <activity android:name=".LoginActivity">
         </activity>
     </application>
 

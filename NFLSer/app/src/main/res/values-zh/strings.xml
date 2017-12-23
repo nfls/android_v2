@@ -86,4 +86,7 @@
     <string name="vibrating">震动中 ...</string>
     <string name="vibrator">震动器</string>
     <string name="version_old_tip">该应用版本不是最新版本, 更新即可享用新的功能与漏洞消除</string>
+    <string name="vibrate_time_hint">选择震动时间</string>
+    <string name="vibrate_amplitude_hint">选择震动幅度</string>
+    <string name="vibrate_mode_hint">选择震动模式</string>
 </resources>

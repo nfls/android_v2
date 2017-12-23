@@ -307,7 +307,8 @@ public class ResourcesActivity extends AppCompatActivity {
                 if (isFolder) path += "/";
                 long date = file.lastModified();
                 long size = file.length();
-                ResourceFile resourceFile = new ResourceFile(name, date, size, path, isFolder, !isFolder);
+                String appHref = "https://nflsio.oss-cn-shanghai.aliyuncs.com" + path;
+                ResourceFile resourceFile = new ResourceFile(name, date, size, path, appHref, isFolder, !isFolder);
                 mData.add(resourceFile);
             }
         }
@@ -349,6 +350,7 @@ public class ResourcesActivity extends AppCompatActivity {
                     isFolder = true;
                 }
                 String href = item.getString("href").replaceAll("\\\\", "");
+                String appHref = item.getString("appHref").replaceAll("\\\\", "");
                 String name;
                 if (isFolder) {
                     name = href.substring(0, href.lastIndexOf("/"));
@@ -373,7 +375,7 @@ public class ResourcesActivity extends AppCompatActivity {
                 long date = item.getLong("time");
                 long size = item.getLong("size");
 
-                files.add(new ResourceFile(name, date, size, href, isFolder, isDownloaded));
+                files.add(new ResourceFile(name, date, size, href, appHref, isFolder, isDownloaded));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -426,7 +428,7 @@ public class ResourcesActivity extends AppCompatActivity {
         String token = getSharedPreferences("user", MODE_APPEND).getString("token", "No Token");
         HttpsURLConnection connection = null;
         try {
-            URL url = new URL("https://dl.nfls.io" + targetFile.getHref());
+            URL url = new URL(targetFile.getAppHref());
             connection = (HttpsURLConnection) url.openConnection();
             connection.setConnectTimeout(NFLSUtil.TIME_OUT);
             connection.setReadTimeout(NFLSUtil.TIME_OUT);

@@ -55,6 +55,7 @@ public class HomeActivity extends AppCompatActivity {
                 Toast.makeText(HomeActivity.this, R.string.request_failed, Toast.LENGTH_SHORT).show();
                 swipeRefreshLayout.setRefreshing(false);
             } else {
+                Log.d("News", response);
                 try {
                     mNewsData.clear();
                     JSONArray jsons = new JSONObject(response).getJSONArray("info");
@@ -169,6 +170,7 @@ public class HomeActivity extends AppCompatActivity {
                 if (i == 1) {
                     if (NFLSUtil.isInternetRequestAvailable(HomeActivity.this)) {
                         if (realNameAuthCheck(HomeActivity.this)) {
+                            Toast.makeText(HomeActivity.this, block.getName(), Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(HomeActivity.this, ResourcesActivity.class));
                         }
                     } else {
@@ -227,6 +229,10 @@ public class HomeActivity extends AppCompatActivity {
                 options.add(getString(R.string.log_out));
                 options.add(getString(R.string.tickets));
                 options.add(getString(R.string.vibrate));
+                options.add(getString(R.string.real_name_auth_activity_title));
+                if (NFLSUtil.isAfterDate(2017, 12, 25, true)) {
+                    options.add("Secret Santa");
+                }
                 View popupView = HomeActivity.this.getLayoutInflater().inflate(R.layout.window_popup_settings, null);
                 ListView listView = (ListView) popupView.findViewById(R.id.list_view_popup);
                 listView.setAdapter(new ArrayAdapter<String>(HomeActivity.this, R.layout.item_list_settings, options));
@@ -265,26 +271,40 @@ public class HomeActivity extends AppCompatActivity {
                                 break;
                             }
                             case 4: {
-                                NFLSUtil.vibrate(HomeActivity.this);
+                                startActivity(new Intent(HomeActivity.this, VibratorActivity.class));
+                                break;
+                            }
+                            case 5: {
+                                if (realNameAuthCheck(HomeActivity.this)) {
+                                    Toast.makeText(HomeActivity.this, "你已经认证过了 !", Toast.LENGTH_SHORT).show();
+                                }
                                 break;
                             }
                             default: {
-                                Toast.makeText(HomeActivity.this,"你tm点了什么弹出这个窗口", Toast.LENGTH_SHORT).show();
+                                if (i == 6) {
+                                    startActivity(new Intent(HomeActivity.this, SecretSantaActivity.class));
+                                } else {
+                                    Toast.makeText(HomeActivity.this,"你tm点了什么弹出这个窗口", Toast.LENGTH_SHORT).show();
+                                }
                                 break;
                             }
                         }
                     }
                 });
-                PopupWindow popupWindow = new PopupWindow(popupView, 200, options.size() * 110);
+                PopupWindow popupWindow = new PopupWindow(popupView, 450, options.size() * 110);
                 popupWindow.setFocusable(true);
                 popupWindow.setOutsideTouchable(true);
                 popupWindow.setBackgroundDrawable(new BitmapDrawable(getResources(), BitmapFactory.decodeResource(getResources(), R.drawable.background_list_settings_popup)));
                 popupWindow.update();
-                popupWindow.showAsDropDown(settings_icon, -40, 5);
+                popupWindow.showAsDropDown(settings_icon, -100, 5);
             }
         });
         preferences = getSharedPreferences("user", MODE_APPEND);
         Toast.makeText(HomeActivity.this, getString(R.string.welcome) + " " + preferences.getString("username", "Unknown") + " !", Toast.LENGTH_SHORT).show();
+
+        if (NFLSUtil.isOnDate(2017, 12, 25) && !preferences.getBoolean("SantaChecked", false)) {
+            startActivity(new Intent(HomeActivity.this, SecretSantaActivity.class));
+        }
     }
 
     private void refreshNews() {

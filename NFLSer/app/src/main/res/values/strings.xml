@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">NFLSer</string>
-    <string name="version_no" translatable="false">0.1.1</string>
+    <string name="version_no" translatable="false">0.1.3</string>
 
     <string name="version">Version</string>
     <string name="developer">Developer</string>
@@ -89,4 +89,7 @@
     <string name="vibrate">Vibrate</string>
     <string name="vibrator">Vibrator</string>
     <string name="vibrating">Vibrating ...</string>
+    <string name="vibrate_mode_hint">Choose the vibration mode</string>
+    <string name="vibrate_time_hint">Choose the vibration time</string>
+    <string name="vibrate_amplitude_hint">Choose the vibration amplitude</string>
 </resources>

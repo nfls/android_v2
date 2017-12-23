@@ -11,14 +11,16 @@ public class ResourceFile {
     private long date;
     private long size;
     private String href;
+    private String appHref;
     private boolean isFolder;
     private boolean downloaded;
 
-    public ResourceFile(String name, long date, long size, String href, boolean isFolder, boolean downloaded) {
+    public ResourceFile(String name, long date, long size, String href, String appHref, boolean isFolder, boolean downloaded) {
         this.name = name;
         this.date = date;
         this.size = size;
         this.href = href;
+        this.appHref = appHref;
         this.isFolder = isFolder;
         this.downloaded = downloaded;
     }
@@ -58,6 +60,10 @@ public class ResourceFile {
 
     public String getHref() {
         return href;
+    }
+
+    public String getAppHref() {
+        return appHref;
     }
 
     public boolean isFolder() {

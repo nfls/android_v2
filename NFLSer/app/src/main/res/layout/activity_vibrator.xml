@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="io.nfls.williamxie.nflser.VibratorActivity">
+
+    <TextView
+        android:id="@+id/mode_spinner_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/vibrate_mode_hint"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"/>
+
+    <Spinner
+        android:id="@+id/mode_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </Spinner>
+
+    <TextView
+        android:id="@+id/time_picker_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/vibrate_time_hint"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:visibility="gone"/>
+
+    <NumberPicker
+        android:id="@+id/time_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/amplitude_picker_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/vibrate_amplitude_hint"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp"
+        android:visibility="gone"/>
+
+    <NumberPicker
+        android:id="@+id/amplitude_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/vibrate_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/selector_button_tint"
+        android:text="@string/vibrate"
+        android:textAlignment="center"
+        android:textColor="@drawable/selector_text_button_tint"
+        android:textStyle="normal"
+        android:textSize="20sp"
+        android:clickable="true"/>
+
+</LinearLayout>

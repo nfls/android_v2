@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class RealNameAuthActivity extends AppCompatActivity {
@@ -56,7 +57,6 @@ public class RealNameAuthActivity extends AppCompatActivity {
                 editor.putBoolean("hasRealNameAuth", true);
                 editor.commit();
                 finish();
-                startActivity(new Intent(RealNameAuthActivity.this, HomeActivity.class));
             }
         }
     };
@@ -142,15 +142,15 @@ public class RealNameAuthActivity extends AppCompatActivity {
             connection.setRequestProperty("Content-Type", "application/json");
 
             JSONObject data = new JSONObject();
-            data.put("chnName", chinese_name);
-            data.put("engName", english_name);
-            data.put("tmpClass", classID);
+            data.put("chnName", new String(chinese_name.getBytes("utf-8")));
+            data.put("engName", new String(english_name.getBytes("utf-8")));
+            data.put("tmpClass",  new String(classID.getBytes("utf-8")));
 
             Log.d("Data", data.toString());
 
             connection.setDoOutput(true);
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-            out.writeBytes(data.toString());
+            out.write(data.toString().getBytes());
             out.flush();
             out.close();
 
